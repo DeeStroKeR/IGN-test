@@ -22,6 +22,7 @@ function Home() {
 	}, [user]);
 
 	const getUserInfo = async (userId: string) => {
+		console.log('Fetching user info for userId:', userId);
 		return await client.models.User.list(
 		).catch((error) => {
 			console.error('Error fetching user info:', error);
