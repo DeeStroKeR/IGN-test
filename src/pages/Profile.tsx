@@ -14,7 +14,7 @@ function Profile() {
 			jobTitle: values.jobTitle,
 			jobDescription: values.jobDescription,
 			aboutMe: values.aboutMe,
-			birthday: values.birthday.toISOString(),
+			birthday: values.birthday.toISOString(), // Placeholder, replace with actual date handling
 			id: user.userId,
 		}).catch((error) => {
 			console.error('Error updating profile:', error);

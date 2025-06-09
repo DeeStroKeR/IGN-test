@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { generateClient } from 'aws-amplify/data';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import type { ProfileForm } from './profileTypes';
-import { type Schema } from '../../amplify/data/resource';
+import { client } from '../http/client';
 
-const client = generateClient<Schema>();
 
 function Home() {
 	const { user } = useAuthenticator((context) => [context.user]);
@@ -24,9 +22,8 @@ function Home() {
 	}, [user]);
 
 	const getUserInfo = async (userId: string) => {
-		return await client.models.User.get({
-			'id': userId,
-		}).catch((error) => {
+		return await client.models.User.list(
+		).catch((error) => {
 			console.error('Error fetching user info:', error);
 			return null;
 		});
