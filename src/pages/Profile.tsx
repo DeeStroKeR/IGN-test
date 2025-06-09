@@ -1,5 +1,6 @@
 import type { ProfileForm } from './profileTypes'
 import { Button, Form, Input, DatePicker } from 'antd'
+import dayjs from 'dayjs'
 import { client } from '../http/client'
 import { useAuthenticator } from '@aws-amplify/ui-react-core';
 
@@ -8,13 +9,14 @@ const { TextArea } = Input;
 function Profile() {
 	const { user } = useAuthenticator((context) => [context.user]);
 	const updateProfile = async (values: ProfileForm) => {
+		console.log('Updating profile with values:', dayjs(values.birthday).format('YYYY-MM-DD').toString(), values, user.userId);
 		await client.models.User.update({
 			name: values.name,
 			surname: values.surname,
 			jobTitle: values.jobTitle,
 			jobDescription: values.jobDescription,
 			aboutMe: values.aboutMe,
-			birthday: values.birthday.toISOString(), // Placeholder, replace with actual date handling
+			birthday: dayjs().format('YYYY-MM-DD').toString(), // Placeholder, replace with actual date handling
 			id: user.userId,
 		}).catch((error) => {
 			console.error('Error updating profile:', error);
