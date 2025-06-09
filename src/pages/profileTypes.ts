@@ -1,8 +1,9 @@
 export interface ProfileForm {
 	name: string
 	surname: string
-	birthday: Date
+	birthday: string
 	aboutMe: string
 	jobTitle: string
 	jobDescription: string
+	id: string
 }
