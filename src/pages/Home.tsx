@@ -23,7 +23,7 @@ function Home() {
 			setIsUserLoading(false);
 		}
 
-		if (errors) {
+		if (errors || !data) {
 			navigate('/profile');
 		}
 	}

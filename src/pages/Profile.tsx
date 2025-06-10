@@ -46,14 +46,15 @@ function Profile() {
 			jobDescription: values.jobDescription,
 			aboutMe: values.aboutMe,
 			birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
-			id: user.userId,
+			owner: user.userId,
 		}
 
 		setIsFormLoading(true);
 
 		if (userInfo) {
 			const { errors } = await client.models.User.update({
-				...data
+				...data,
+				id : userInfo.id || ''
 			})
 
 			if (errors) {
@@ -63,7 +64,8 @@ function Profile() {
 			}
 		} else {
 			const { errors } = await client.models.User.create({
-				...data
+				...data,
+				id: user.userId
 			})
 
 			if (errors) {

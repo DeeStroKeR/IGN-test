@@ -15,9 +15,9 @@ const schema = a.schema({
       jobDescription: a.string().required(),
       aboutMe: a.string().required(),
       birthday: a.date().required(),
-      id: a.id().required(),
+      owner: a.string().required()
     })
-    .authorization((allow) => [allow.publicApiKey()]),
+    .authorization((allow) => [allow.owner()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -25,7 +25,7 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: 'apiKey',
+    defaultAuthorizationMode: 'userPool',
     apiKeyAuthorizationMode: { expiresInDays: 30 }
   }
 });
