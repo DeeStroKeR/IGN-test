@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.5.5",
+    "@soulmachines/smwebsdk": "^15.8.1",
     "antd": "^5.25.4",
     "aws-amplify": "^6.6.6",
     "dayjs": "^1.11.13",
