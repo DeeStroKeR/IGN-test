@@ -4,7 +4,7 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 import type { ProfileForm } from './profileTypes';
 import { client } from '../http/client';
 import { useNavigate } from 'react-router';
-import { Scene } from '@soulmachines/smwebsdk';
+import { Scene, Persona } from '@soulmachines/smwebsdk';
 
 const apiKey =
   'eyJzb3VsSWQiOiJkZG5hLWlndHBhbHRkLS10ZXN0cHJvamVjdCIsImF1dGhTZXJ2ZXIiOiJodHRwczovL2RoLnNvdWxtYWNoaW5lcy5jbG91ZC9hcGkvand0IiwiYXV0aFRva2VuIjoiYXBpa2V5X3YxXzg5ODUxNjQ3LWE5MmYtNGZhNC1iZDllLTBiMWZhZDg3YWFkZCJ9';
@@ -23,13 +23,13 @@ function Home() {
 	const navigate = useNavigate();
 
 	console.log(videoRef)
+  console.log('version 1.2.0');
 	
 	useEffect(() => {
 		getUserInfo(user.userId)
 	}, [user]);
 
 	useEffect(() => {
-    // Подписка на события после создания сцены
     if (!sceneRef.current) return;
 
     const scene = sceneRef.current;
@@ -98,8 +98,39 @@ function Home() {
 		// @ts-expect-error skip for now
       const sessionId = await sceneRef.current.connect();
       console.info('success! session id:', sessionId);
+      // @ts-expect-error skip for now
+      console.log('currentPersonaId', sceneRef.current?.currentPersonaId);
+      // @ts-expect-error skip for now
+      const persona = new Persona(sceneRef.current, sceneRef.current?.currentPersonaId);
+      persona.conversationSetVariables({
+        userInfo: {
+          name: userInfo?.name,
+          surname: userInfo?.surname,
+          jobTitle: userInfo?.jobTitle,
+          jobDescription: userInfo?.jobDescription,
+          aboutMe: userInfo?.aboutMe,
+          birthday: userInfo?.birthday,
+          id: user.userId,
+        }
+      });
+
+      console.log(sceneRef.current);
+      console.info('Persona created:', persona);
       setStatus('Connected');
-// @ts-expect-error skip for now
+      // persona.startSpeaking("hello my friend");
+      persona.conversationSend('USERINFO', {
+        "name" : 'mynale'
+      }, {
+        "userInfo": {
+          "name": "Ann Watson",
+          "surname": "Watson",
+          "jobTitle": "Software Engineer",
+          "jobDescription": "Building amazing things with Soul Machines",
+          "aboutMe": "I love coding and creating digital experiences.",
+          "birthday": "1990-01-01"
+        }
+      });
+      // @ts-expect-error skip for now
       const videoState = await sceneRef.current.startVideo();
       console.info('started video with state:', videoState);
     } catch (error) {
@@ -120,11 +151,11 @@ function Home() {
   };
 
   const reset = () => {
-    // Отключаем сцену, очищаем видео и статус
     if (sceneRef.current) {
 		// @ts-expect-error skip for now
       sceneRef.current.disconnect();
       sceneRef.current = null;
+      // setTranscript([]);
     }
     setStatus('Disconnected');
   };
