@@ -21,9 +21,6 @@ function Home() {
 	const [transcript, setTranscript] = useState([]);
 	const [inputText, setInputText] = useState('');
 	const navigate = useNavigate();
-
-	console.log(videoRef)
-  console.log('version 1.2.0');
 	
 	useEffect(() => {
 		getUserInfo(user.userId)
@@ -67,6 +64,42 @@ function Home() {
     };
   }, [sceneRef.current]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+  const scene = sceneRef.current;
+  if (!scene) return;
+  // @ts-expect-error skip for now
+  const originalHandler = scene.onSceneMessage;
+    // @ts-expect-error skip for now
+  scene.onSceneMessage = function (message) {
+    // console.log('🧠 [custom hook] Incoming scene message:', message);
+
+    if (message.name === 'conversationResult') {
+      console.log('conversationResult:', message);
+      if (message.body.output.context.public_front_task) {
+        console.log('Front-end action detected:', message.body.output.context.public_front_task);
+        const json = JSON.parse(message.body.output.context.public_front_task);
+        if (json && json.type === "open_external_link" && json.url) {
+          console.log('Opening external link:', json.url);
+          window.location.href = json.url;
+        }
+      }
+    }
+
+    
+
+    // Пример фильтра:
+    // if (message.name === 'myCustomServerCommand') {
+    //   console.log('🧩 My command body:', message.body);
+    // }
+
+    // Передаём дальше — иначе SDK "ослепнет"
+
+      return originalHandler.call(this, message);
+
+    
+  };
+}, [sceneRef.current]);
+
 	const getUserInfo = async (userId: string) => {
 		const { data, errors } = await client.models.User.get({ id: userId });
 		if (data) {
@@ -97,9 +130,6 @@ function Home() {
     try {
 		// @ts-expect-error skip for now
       const sessionId = await sceneRef.current.connect();
-      console.info('success! session id:', sessionId);
-      // @ts-expect-error skip for now
-      console.log('currentPersonaId', sceneRef.current?.currentPersonaId);
       // @ts-expect-error skip for now
       const persona = new Persona(sceneRef.current, sceneRef.current?.currentPersonaId);
       persona.conversationSetVariables({
@@ -114,8 +144,6 @@ function Home() {
         }
       });
 
-      console.log(sceneRef.current);
-      console.info('Persona created:', persona);
       setStatus('Connected');
       // persona.startSpeaking("hello my friend");
       persona.conversationSend('USERINFO', {
