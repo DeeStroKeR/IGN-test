@@ -80,7 +80,7 @@ function Home() {
         const json = JSON.parse(message.body.output.context.public_front_task);
         if (json && json.type === "open_external_link" && json.url) {
           console.log('Opening external link:', json.url);
-          window.location.href = json.url;
+          navigate('/breathe')
         }
       }
     }
