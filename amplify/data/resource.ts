@@ -10,7 +10,7 @@ const schema = a.schema({
   User: a
     .model({
       name: a.string().required(),
-      gender: a.string().default(''),
+      gender: a.string().required().default(''),
       jobTitle: a.string().required(),
       jobDescription: a.string().required(),
       aboutMe: a.string().required(),
