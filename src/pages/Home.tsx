@@ -95,7 +95,10 @@ function Home() {
 	const getUserInfo = async (userId: string) => {
 		const { data, errors } = await client.models.User.get({ id: userId });
 		if (data) {
-			setUserInfo(data);
+      setUserInfo({
+        ...data,
+        gender: data.gender ?? '',
+      });
 			setIsUserLoading(false);
 		}
 

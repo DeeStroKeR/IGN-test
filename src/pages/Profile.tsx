@@ -22,11 +22,14 @@ function Profile() {
 	const getUserInfo = async (userId: string) => {
 		const { data } = await client.models.User.get({ id: userId });
 		if (data) {
-			setUserInfo(data);
+			setUserInfo({
+				...data,
+				gender: data.gender ?? '', // Ensure gender is always a string
+			});
 			// Populate form with user info
 			form.setFieldsValue({
 				name: data.name,
-				gender: data.gender,
+				gender: data.gender ?? '',
 				birthday: dayjs(data.birthday),
 				aboutMe: data.aboutMe,
 				jobTitle: data.jobTitle,
