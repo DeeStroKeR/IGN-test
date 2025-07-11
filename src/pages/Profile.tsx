@@ -1,5 +1,5 @@
 import type { ProfileForm } from './profileTypes'
-import { Button, Form, Input, DatePicker, message } from 'antd'
+import { Button, Form, Input, DatePicker, message, Select } from 'antd'
 import dayjs from 'dayjs'
 import { client } from '../http/client'
 import { useAuthenticator } from '@aws-amplify/ui-react-core';
@@ -26,7 +26,7 @@ function Profile() {
 			// Populate form with user info
 			form.setFieldsValue({
 				name: data.name,
-				surname: data.surname,
+				gender: data.gender,
 				birthday: dayjs(data.birthday),
 				aboutMe: data.aboutMe,
 				jobTitle: data.jobTitle,
@@ -41,7 +41,7 @@ function Profile() {
 		setIsFormLoading(true);
 		const data: ProfileForm = {
 			name: values.name,
-			surname: values.surname,
+			gender: values.gender,
 			jobTitle: values.jobTitle,
 			jobDescription: values.jobDescription,
 			aboutMe: values.aboutMe,
@@ -85,21 +85,21 @@ function Profile() {
 	return (
 		<>
 			<h1>Profile</h1>
-			<p>{userInfo ? 'Update your profile information below:' : 'To start use application please update information about yourself'}</p>
+			<p style={{ fontWeight: 'bold'}}>{userInfo ? 'Update your profile information below:' : 'To start use application please update information about yourself'}</p>
 			<Form
 				name="basic"
 				form={form}
 				disabled={isFormLoading}
 				labelCol={{ span: 8 }}
 				wrapperCol={{ span: 16 }}
-				style={{ maxWidth: 600 }}
+				style={{ maxWidth: 800 }}
 				initialValues={{ remember: true, ...userInfo }}
 				onFinish={updateProfile}
 				// onFinishFailed={onFinishFailed}
 				autoComplete="off"
 			>
 				<Form.Item<ProfileForm>
-					label="Name"
+					label="Name/Nickname"
 					name="name"
 					rules={[{ required: true, message: 'Please input your name!' }]}
 				>
@@ -107,42 +107,48 @@ function Profile() {
 				</Form.Item>
 	
 				<Form.Item<ProfileForm>
-					label="Surname"
-					name="surname"
-					rules={[{ required: true, message: 'Please input your surname!' }]}
+					label="Gender"
+					name="gender"
+					rules={[{ required: true, message: 'Please select your gender!' }]}
 				>
-					<Input/>
+					<Select>
+						<Select.Option value="male">Male</Select.Option>
+						<Select.Option value="female">Female</Select.Option>
+						<Select.Option value="non binary">Non-binary</Select.Option>
+						<Select.Option value="not specified">Not specified</Select.Option>
+					</Select>
 				</Form.Item>
 	
 				<Form.Item<ProfileForm>
-					label="DatePicker"
+					label="Date of birth"
 					name="birthday"
 					rules={[{ required: true, message: 'Please select your birthday!' }]}
 				>
-					<DatePicker />
+					<DatePicker disabledDate={(current) => current && current > dayjs().endOf('day')} />
 				</Form.Item>
-	
-	
+
+				<p style={{ fontWeight: 'bold'}}>If you're comfortable with it, share some more info about yourself</p>
+
 				<Form.Item<ProfileForm>
-					label="Describe yourself"
+					label="What are your hobbies and interests?"
 					name="aboutMe"
-					rules={[{ required: true, message: 'Please describe yourself!' }]}
+					colon={false}
 				>
 					<TextArea rows={4} />
 				</Form.Item>
 	
 				<Form.Item<ProfileForm>
-					label="Job title"
+					label="What's your job?"
 					name="jobTitle"
-					rules={[{ required: true, message: 'Please input your job title!' }]}
+					colon={false}
 				>
 					<Input />
 				</Form.Item>
 	
 				<Form.Item<ProfileForm>
-					label="Job description"
+					label="How would you describe your job?"
 					name="jobDescription"
-					rules={[{ required: true, message: 'Please describe your job!' }]}
+					colon={false}
 				>
 					<TextArea rows={4} />
 				</Form.Item>

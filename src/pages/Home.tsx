@@ -5,6 +5,7 @@ import type { ProfileForm } from './profileTypes';
 import { client } from '../http/client';
 import { useNavigate } from 'react-router';
 import { Scene, Persona } from '@soulmachines/smwebsdk';
+import { Button, Card } from 'antd';
 
 const apiKey =
   'eyJzb3VsSWQiOiJkZG5hLWlndHBhbHRkLS10ZXN0cHJvamVjdCIsImF1dGhTZXJ2ZXIiOiJodHRwczovL2RoLnNvdWxtYWNoaW5lcy5jbG91ZC9hcGkvand0IiwiYXV0aFRva2VuIjoiYXBpa2V5X3YxXzg5ODUxNjQ3LWE5MmYtNGZhNC1iZDllLTBiMWZhZDg3YWFkZCJ9';
@@ -85,15 +86,6 @@ function Home() {
       }
     }
 
-    
-
-    // Пример фильтра:
-    // if (message.name === 'myCustomServerCommand') {
-    //   console.log('🧩 My command body:', message.body);
-    // }
-
-    // Передаём дальше — иначе SDK "ослепнет"
-
       return originalHandler.call(this, message);
 
     
@@ -135,7 +127,7 @@ function Home() {
       persona.conversationSetVariables({
         userInfo: {
           name: userInfo?.name,
-          surname: userInfo?.surname,
+          gender: userInfo?.gender,
           jobTitle: userInfo?.jobTitle,
           jobDescription: userInfo?.jobDescription,
           aboutMe: userInfo?.aboutMe,
@@ -151,7 +143,7 @@ function Home() {
       }, {
         "userInfo": {
           "name": "Ann Watson",
-          "surname": "Watson",
+          "gender": "female",
           "jobTitle": "Software Engineer",
           "jobDescription": "Building amazing things with Soul Machines",
           "aboutMe": "I love coding and creating digital experiences.",
@@ -188,6 +180,7 @@ function Home() {
     setStatus('Disconnected');
   };
 
+  // @ts-expect-error skip for now
   const sendMessage = () => {
   if (!sceneRef.current) return;
 
@@ -208,9 +201,9 @@ function Home() {
 		<div
 
 		>
-			Content, {user.userId} {userInfo ? `- ${userInfo.name} ${userInfo.surname}` : ''}
+			<p style={{ fontWeight: 'bold' }}>Welcome, {userInfo?.name}. To start, click ‘CONNECT’</p>
 			<div>
-      <div style={{ width: '640px', height: '480px', border: '1px solid #ccc' }}>
+      <Card style={{ width: '640px', height: '320px', overflow: 'hidden', margin: '0 auto' }}>
         <video
           ref={videoRef}
           id="sm-video"
@@ -219,17 +212,17 @@ function Home() {
           autoPlay
           playsInline
         />
-      </div>
+      </Card>
 
-      <div style={{ marginTop: 10 }}>
-        <button onClick={connect}>Connect</button>
-        <button onClick={reset} style={{ marginLeft: 10 }}>
-          Reset
-        </button>
+      <div style={{ margin: "10px auto 0 auto", width: 'fit-content' }}>
+        <Button type="primary" onClick={connect}>CONNECT</Button>
+        <Button onClick={reset} style={{ marginLeft: 10 }}>
+          Disconnect
+        </Button>
       </div>
-
-      <div style={{ marginTop: 10 }}>
-        <input
+      {/* use persona.conversationSend to send text to backend. also need write logic to handle this messages because this messages has another type of message name */}
+      {/* <div style={{ marginTop: 10 }}>
+        <Input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
@@ -239,26 +232,26 @@ function Home() {
             if (e.key === 'Enter') sendMessage();
           }}
         />
-        <button onClick={sendMessage} style={{ marginLeft: 5 }}>
+        <Button type="primary" onClick={sendMessage} style={{ marginLeft: 5 }}>
           Send
-        </button>
-      </div>
-
-      <div style={{ marginTop: 10, maxHeight: '300px', overflowY: 'auto', border: '1px solid #ddd', padding: '10px' }}>
+        </Button>
+      </div> */}
+      <p>iGT-PA! is a self-help app we are not clinicians and are not qualified therapists. We cannot offer clinical support for your condition, but we can send valuable insights to your GP or professional therapist. What we can do is support you to manage your anxiety levels which may ease the impact your condition has on you.</p>
+      <Card style={{ marginTop: 10, minHeight: '150px', maxHeight: '250px', overflowY: 'auto', border: '1px solid #ddd', padding: '10px', height: '250px' }}>
         {transcript.map((entry, i) => (
           <div key={i} style={{ marginBottom: 8 }}>
 			{ /* @ts-expect-error skip for now */}
-            <strong style={{ color: entry.source === 'user' ? 'blue' : 'green' }}>
+            <strong style={{ color: entry.source === 'user' ? '#31839d' : '#ff8160' }}>
 				{ /* @ts-expect-error skip for now */}
-              {entry.source === 'user' ? 'You:' : 'Digital Person:'}
+              {entry.source === 'user' ? `${userInfo?.name}` : 'AVA'}
             </strong>{' '}
 			{ /* @ts-expect-error skip for now */}
             {entry.text}
           </div>
         ))}
-      </div>
+      </Card>
 
-      <div style={{ marginTop: 10 }}>Status: {status}</div>
+      <div style={{ marginTop: 10 }}>Status: <span style={{ fontWeight: 'bold' }}>{status}</span></div>
     </div>
 		</div>
 	)

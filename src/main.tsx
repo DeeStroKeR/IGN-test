@@ -17,6 +17,7 @@ import ResonanceBreathing from './pages/ResonanceBreathing/ResonanceBreathing.ts
 import PursedLipBreathing from './pages/PursedLipBreathing/PursedLipBreathing.tsx';
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "./theme.ts";
+import { ConfigProvider } from 'antd';
 
 Amplify.configure(outputs);
 
@@ -56,6 +57,34 @@ const router = createBrowserRouter(
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Authenticator><RouterProvider router={router}/></Authenticator>
+    <Authenticator>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: '#31839d',
+          },
+          components: {
+            Layout: {
+              headerBg: '#31839d',
+            },
+            Menu: {
+              "horizontalItemHoverBg": "#31839d",
+              "horizontalItemSelectedBg": "#ffd3c8",
+              "horizontalItemSelectedColor": "#2a2e30",
+              "itemBg": "rgb(49,131,157)",
+              "itemColor": "rgba(255,255,255,0.65)",
+              "itemHoverBg": "#ffd3c8",
+              "itemHoverColor": "#fff",
+            },
+            Card: {
+              padding: 0,
+              paddingLG: 0
+            }
+          }
+        }}
+      >
+        <RouterProvider router={router}/>
+      </ConfigProvider>
+    </Authenticator>
   </StrictMode>,
 )

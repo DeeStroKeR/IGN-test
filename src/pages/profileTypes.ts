@@ -1,6 +1,6 @@
 export interface ProfileForm {
 	name: string
-	surname: string
+	gender: string
 	birthday: string
 	aboutMe: string
 	jobTitle: string
