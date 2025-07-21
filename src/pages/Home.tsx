@@ -163,6 +163,7 @@ function Home() {
     });
 
     try {
+      await sceneRef.current.connect();
       const persona = new Persona(sceneRef.current, sceneRef.current?.currentPersonaId);
       persona.conversationSetVariables({
         userInfo: {
