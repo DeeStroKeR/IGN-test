@@ -40,11 +40,15 @@ function Home() {
 
     const scene = sceneRef.current;
 	// @ts-expect-error skip for now skip for now
-    const onStateEventHandler = (scene, event) => {
+    const onStateEventHandler = (scene: Scene, event) => {
       const personaState = event.persona?.['1'];
       if (personaState?.speechState === 'speaking') {
         const personaSpeech = personaState.currentSpeech;
         if (personaSpeech) {
+          if (!scene.isMicrophoneActive()) {
+            console.log('Setting microphone active');
+            scene.setMediaDeviceActive({ microphone: true, camera: true });
+          }
 			// @ts-expect-error skip for now
           setTranscript(prev => [...prev, { source: 'persona', text: personaSpeech }]);
         }
@@ -162,8 +166,17 @@ function Home() {
       requiredMediaDevices: { microphone: true, camera: true },
     });
 
+    // sceneRef.current.setMediaDeviceActive({
+    //   microphone: false,
+    //   camera: true
+    // });
+
     try {
       await sceneRef.current.connect();
+      sceneRef.current.setMediaDeviceActive({
+        microphone: false,
+        camera: true
+      });
       const persona = new Persona(sceneRef.current, sceneRef.current?.currentPersonaId);
       persona.conversationSetVariables({
         userInfo: {
@@ -285,6 +298,7 @@ function Home() {
           height="100%"
           autoPlay
           playsInline
+          style={{ opacity: transcript.length > 0 ? 1 : 0 }}
         />
       </Card>
 
