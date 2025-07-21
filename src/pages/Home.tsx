@@ -4,23 +4,31 @@ import { useAuthenticator } from '@aws-amplify/ui-react';
 import type { ProfileForm } from './profileTypes';
 import { client } from '../http/client';
 import { useNavigate } from 'react-router';
-import { Scene, Persona } from '@soulmachines/smwebsdk';
+import { Scene, Persona, ConnectionStateData, ConversationResultResponseBody } from '@soulmachines/smwebsdk';
 import { Button, Card } from 'antd';
+import { SceneResponse } from '@soulmachines/smwebsdk/lib-esm/websocket-message/scene/SceneResponse';
 
 const apiKey =
   'eyJzb3VsSWQiOiJkZG5hLWlndHBhbHRkLS10ZXN0cHJvamVjdCIsImF1dGhTZXJ2ZXIiOiJodHRwczovL2RoLnNvdWxtYWNoaW5lcy5jbG91ZC9hcGkvand0IiwiYXV0aFRva2VuIjoiYXBpa2V5X3YxXzg5ODUxNjQ3LWE5MmYtNGZhNC1iZDllLTBiMWZhZDg3YWFkZCJ9';
 
+interface Exercise {
+  type: string;
+  url: string;
+}
 
 function Home() {
 	const { user } = useAuthenticator((context) => [context.user]);
 	const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
 	const [userInfo, setUserInfo] = useState<ProfileForm | null>(null);
 
-	const videoRef = useRef(null);
-	const sceneRef = useRef(null);
-	const [status, setStatus] = useState('Disconnected');
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const sceneRef = useRef<Scene | null>(null);
+  const [status, setStatus] = useState('Disconnected');
 	const [transcript, setTranscript] = useState([]);
-	const [inputText, setInputText] = useState('');
+	// const [inputText, setInputText] = useState('');
+  const [loadProgress, setLoadProgress] = useState(0);
+  const [isPersonLoading, setIsPersonLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>();
 	const navigate = useNavigate();
 	
 	useEffect(() => {
@@ -52,35 +60,69 @@ function Home() {
         setTranscript(prev => [...prev, { source: 'user', text: userSpeech }]);
       }
     };
-// @ts-expect-error skip for now
+
     scene.onStateEvent.addListener(onStateEventHandler);
-	// @ts-expect-error skip for now
     scene.onRecognizeResultsEvent.addListener(onRecognizeResultsHandler);
+    scene.connectionState.onConnectionStateUpdated.addListener(
+      (connectionStateData: ConnectionStateData) => {
+        console.log(connectionStateData);
+        setLoadProgress(connectionStateData.percentageLoaded);
+      }
+    );
+    scene.onDisconnectedEvent.addListener((scene: string, sessionId: string, reason: string) => {
+      onDisconnectedEventHandler(scene, sessionId, reason);
+      setStatus('Disconnected');
+    });
+
+    const onDisconnectedEventHandler = (_scene: string, _sessionId: string, reason: string) => {
+      const messages = {
+      sessionTimeout: '⏱️ The session timed out due to user inactivity.',
+      conversationEnded: '💬 The conversation was ended by the NLP provider or persona.',
+      controlDisconnected: '🛑 The connection to the orchestration server was lost.',
+      normal: '✅ The connection was closed normally.',
+    };
+
+      setError(reason in messages ? messages[reason as keyof typeof messages] : `❓ Unknown disconnect reason: ${reason}`);
+    };
 
     return () => {
-		// @ts-expect-error skip for now
       scene.onStateEvent.removeListener(onStateEventHandler);
-	  // @ts-expect-error skip for now
       scene.onRecognizeResultsEvent.removeListener(onRecognizeResultsHandler);
+      scene.onDisconnectedEvent.removeListener(onDisconnectedEventHandler);
     };
   }, [sceneRef.current]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
   const scene = sceneRef.current;
   if (!scene) return;
-  // @ts-expect-error skip for now
+
   const originalHandler = scene.onSceneMessage;
-    // @ts-expect-error skip for now
-  scene.onSceneMessage = function (message) {
+  scene.onSceneMessage = function (message: SceneResponse) {
     // console.log('🧠 [custom hook] Incoming scene message:', message);
+    console.log('WS message received:', message);
 
     if (message.name === 'conversationResult') {
       console.log('conversationResult:', message);
-      if (message.body.output.context.public_front_task) {
-        console.log('Front-end action detected:', message.body.output.context.public_front_task);
-        const json = JSON.parse(message.body.output.context.public_front_task);
+      const body = message.body as ConversationResultResponseBody;
+      if (
+        body &&
+        body.output &&
+        body.output.context &&
+        body.output.context.public_front_task
+      ) {
+        console.log('Front-end action detected:', body.output.context.public_front_task);
+        const publicFrontTask = body.output.context.public_front_task;
+        let json: Exercise | null = null;
+        if (typeof publicFrontTask === 'string' && publicFrontTask.trim() !== '') {
+          try {
+            json = JSON.parse(publicFrontTask);
+          } catch (e) {
+            console.warn('Failed to parse public_front_task:', e);
+          }
+        }
         if (json && json.type === "open_external_link" && json.url) {
           console.log('Opening external link:', json.url);
+          reset();
           navigate('/breathe')
         }
       }
@@ -105,13 +147,14 @@ function Home() {
 	}
 
 	const connect = async () => {
+    setIsPersonLoading(true);
     if (!videoRef.current) {
       console.warn('Video element not mounted yet');
       return;
     }
 
     setStatus('Connecting...');
-// @ts-expect-error skip for now
+
     sceneRef.current = new Scene({
       apiKey: apiKey,
       videoElement: videoRef.current,
@@ -120,9 +163,6 @@ function Home() {
     });
 
     try {
-		// @ts-expect-error skip for now
-      const sessionId = await sceneRef.current.connect();
-      // @ts-expect-error skip for now
       const persona = new Persona(sceneRef.current, sceneRef.current?.currentPersonaId);
       persona.conversationSetVariables({
         userInfo: {
@@ -136,43 +176,81 @@ function Home() {
         }
       });
 
+
       setStatus('Connected');
-      // persona.startSpeaking("hello my friend");
-      persona.conversationSend('USERINFO', {
-        "name" : 'mynale'
-      }, {
-        "userInfo": {
-          "name": "Ann Watson",
-          "gender": "female",
-          "jobTitle": "Software Engineer",
-          "jobDescription": "Building amazing things with Soul Machines",
-          "aboutMe": "I love coding and creating digital experiences.",
-          "birthday": "1990-01-01"
-        }
-      });
-      // @ts-expect-error skip for now
       const videoState = await sceneRef.current.startVideo();
       console.info('started video with state:', videoState);
-    } catch (error) {
+
+      // persona.conversationSend('hello my name is Anton. Im 30 yers old. Love fishing. Im feel bad right now', {
+      //   userInfo: {
+      //     name: userInfo?.name,
+      //     gender: userInfo?.gender,
+      //     jobTitle: userInfo?.jobTitle,
+      //     jobDescription: userInfo?.jobDescription,
+      //     aboutMe: userInfo?.aboutMe,
+      //     birthday: userInfo?.birthday,
+      //     id: user.userId,
+      //   }
+      // }, {});
+      setIsPersonLoading(false);
+    } catch (error: unknown) {
       setStatus('Connection failed');
-	  // @ts-expect-error skip for now
-      switch (error.name) {
-        case 'noUserMedia':
-          console.warn('user blocked device access');
-          break;
-        case 'noScene':
-        case 'serverConnectionFailed':
-          console.warn('server connection failed');
-          break;
-        default:
-          console.warn('unhandled error:', error);
+      if (typeof error === 'object' && error !== null && 'name' in error && 'message' in error) {
+        switch ((error as { name: string }).name) {
+          case 'noUserMedia':
+            console.log('🎙️ User declined access to microphone/camera or they are unavailable.');
+            setError('🎙️ User declined access to microphone/camera or they are unavailable.');
+            break;
+
+          case 'noScene':
+            console.log('🧑‍🚀 No persona available, server might be busy.');
+            setError('🧑‍🚀 No persona available, server might be busy.');
+            break;
+
+          case 'serverConnectionFailed':
+            console.log('🌐 Failed to connect to the server.');
+            setError('🌐 Failed to connect to the server.');
+            break;
+
+          case 'notSupported':
+            console.log('🧭 Browser does not support getUserMedia.');
+            setError('🧭 Browser does not support getUserMedia.');
+            break;
+
+          case 'mediaStreamFailed':
+            console.log('📡 Audio/video stream failed to start.');
+            setError('📡 Audio/video stream failed to start.');
+            break;
+
+          case 'sessionTimeout':
+            console.log('⏱️ Session timed out before it was fully available.');
+            setError('⏱️ Session timed out before it was fully available.');
+            break;
+
+          case 'controlFailed':
+            console.log('🕹️ Failed to establish a control connection to the orchestration server.');
+            setError('🕹️ Failed to establish a control connection to the orchestration server.');
+            break;
+
+          case 'noSessionToResume':
+            console.log('🔁 Could not resume previous session with session persistence.');
+            setError('🔁 Could not resume previous session with session persistence.');
+            break;
+
+          default:
+            console.log('❓ Unhandled error:', (error as { name: string }).name, (error as { message: string }).message);
+            setError(`❓ Unhandled error: ${(error as { name: string }).name} - ${(error as { message: string }).message}`);
+            break;
+        }
+      } else {
+        console.log('❓ Unhandled error:', error);
+        setError(`❓ Unhandled error: ${error}`);
       }
     }
   };
 
   const reset = () => {
     if (sceneRef.current) {
-		// @ts-expect-error skip for now
       sceneRef.current.disconnect();
       sceneRef.current = null;
       // setTranscript([]);
@@ -180,17 +258,14 @@ function Home() {
     setStatus('Disconnected');
   };
 
-  // @ts-expect-error skip for now
-  const sendMessage = () => {
-  if (!sceneRef.current) return;
+//   const sendMessage = () => {
+//   if (!sceneRef.current) return;
 
-  if (inputText.trim() === '') return;
-// @ts-expect-error skip for now
-  sceneRef.current.sendInputText(inputText);
-// @ts-expect-error skip for now
-  setTranscript(prev => [...prev, { source: 'user', text: inputText }]);
-  setInputText('');
-};
+//   if (inputText.trim() === '') return;
+//   sceneRef.current.sendInputText(inputText);
+//   setTranscript(prev => [...prev, { source: 'user', text: inputText }]);
+//   setInputText('');
+// };
 
 	if (isUserLoading) {
 		return <Loader />;
@@ -198,9 +273,7 @@ function Home() {
 
 
 	return (
-		<div
-
-		>
+		<div>
 			<p style={{ fontWeight: 'bold' }}>Welcome, {userInfo?.name}. To start, click ‘CONNECT’</p>
 			<div>
       <Card style={{ width: '640px', height: '320px', overflow: 'hidden', margin: '0 auto' }}>
@@ -215,7 +288,7 @@ function Home() {
       </Card>
 
       <div style={{ margin: "10px auto 0 auto", width: 'fit-content' }}>
-        <Button type="primary" onClick={connect}>CONNECT</Button>
+        <Button type="primary" disabled={isPersonLoading || status === 'Connected'} onClick={connect}>CONNECT</Button>
         <Button onClick={reset} style={{ marginLeft: 10 }}>
           Disconnect
         </Button>
@@ -251,7 +324,8 @@ function Home() {
         ))}
       </Card>
 
-      <div style={{ marginTop: 10 }}>Status: <span style={{ fontWeight: 'bold' }}>{status}</span></div>
+      <div style={{ marginTop: 10 }}>Status: <span style={{ fontWeight: 'bold' }}>{status}</span>{loadProgress > 0 && loadProgress < 100 && ` (Loading: ${loadProgress}%)`}</div>
+      {error && <p><span style={{ color: 'red', fontWeight: 'bold' }}>Error:</span> {error}</p>}
     </div>
 		</div>
 	)
