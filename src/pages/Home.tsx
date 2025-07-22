@@ -166,11 +166,6 @@ function Home() {
       requiredMediaDevices: { microphone: true, camera: true },
     });
 
-    // sceneRef.current.setMediaDeviceActive({
-    //   microphone: false,
-    //   camera: true
-    // });
-
     try {
       await sceneRef.current.connect();
       sceneRef.current.setMediaDeviceActive({
@@ -178,6 +173,19 @@ function Home() {
         camera: true
       });
       const persona = new Persona(sceneRef.current, sceneRef.current?.currentPersonaId);
+      persona.conversationSend('init', {
+        userInfo: {
+          name: userInfo?.name,
+          gender: userInfo?.gender,
+          jobTitle: userInfo?.jobTitle,
+          jobDescription: userInfo?.jobDescription,
+          aboutMe: userInfo?.aboutMe,
+          birthday: userInfo?.birthday,
+          id: user.userId,
+        }
+      }, {
+        kind: 'init'
+      });
       persona.conversationSetVariables({
         userInfo: {
           name: userInfo?.name,
@@ -195,17 +203,7 @@ function Home() {
       const videoState = await sceneRef.current.startVideo();
       console.info('started video with state:', videoState);
 
-      // persona.conversationSend('hello my name is Anton. Im 30 yers old. Love fishing. Im feel bad right now', {
-      //   userInfo: {
-      //     name: userInfo?.name,
-      //     gender: userInfo?.gender,
-      //     jobTitle: userInfo?.jobTitle,
-      //     jobDescription: userInfo?.jobDescription,
-      //     aboutMe: userInfo?.aboutMe,
-      //     birthday: userInfo?.birthday,
-      //     id: user.userId,
-      //   }
-      // }, {});
+      
       setIsPersonLoading(false);
     } catch (error: unknown) {
       setStatus('Connection failed');
@@ -339,7 +337,7 @@ function Home() {
         ))}
       </Card>
 
-      <div style={{ marginTop: 10 }}>Status: <span style={{ fontWeight: 'bold' }}>{status}</span>{loadProgress > 0 && loadProgress < 100 && ` (Loading: ${loadProgress}%)`}</div>
+      <div style={{ marginTop: 10 }}>Status: <span style={{ fontWeight: 'bold' }}>{status}</span>{(status === 'Connected' && transcript.length < 1) && ` loading avatar...`}{loadProgress > 0 && loadProgress < 100 && ` (Loading: ${loadProgress}%)`}</div>
       {error && <p><span style={{ color: 'red', fontWeight: 'bold' }}>Error:</span> {error}</p>}
     </div>
 		</div>
