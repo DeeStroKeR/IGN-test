@@ -16,6 +16,11 @@ interface Exercise {
   url: string;
 }
 
+interface TranscriptEntry {
+  source: 'user' | 'persona';
+  text: string;
+}
+
 function Home() {
 	const { user } = useAuthenticator((context) => [context.user]);
 	const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
@@ -23,8 +28,9 @@ function Home() {
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const sceneRef = useRef<Scene | null>(null);
+  const personaInstanceRef = useRef<Persona | null>(null);
   const [status, setStatus] = useState('Disconnected');
-	const [transcript, setTranscript] = useState([]);
+	const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
 	// const [inputText, setInputText] = useState('');
   const [loadProgress, setLoadProgress] = useState(0);
   const [isPersonLoading, setIsPersonLoading] = useState<boolean>(false);
@@ -49,18 +55,31 @@ function Home() {
             console.log('Setting microphone active');
             scene.setMediaDeviceActive({ microphone: true, camera: true });
           }
-			// @ts-expect-error skip for now
           setTranscript(prev => [...prev, { source: 'persona', text: personaSpeech }]);
         }
       }
     };
 // @ts-expect-error skip for now
-    const onRecognizeResultsHandler = (scene, status, errorMessage, results) => {
+    const onRecognizeResultsHandler = (scene: Scene, status, errorMessage, results) => {
       if (!results || results.length === 0) return;
       const result = results[0];
       if (result.final === true) {
         const userSpeech = result.alternatives[0].transcript;
-		// @ts-expect-error skip for now
+        console.log('Sending user speech to persona:', userSpeech, personaInstanceRef.current);
+        if (personaInstanceRef.current) {
+          personaInstanceRef.current.conversationSend(userSpeech, {
+            userInfo: {
+              name: userInfo?.name,
+              gender: userInfo?.gender,
+              jobTitle: userInfo?.jobTitle,
+              jobDescription: userInfo?.jobDescription,
+              aboutMe: userInfo?.aboutMe,
+              birthday: userInfo?.birthday,
+              id: user.userId,
+            }
+          },
+            { kind: 'userTalk' });
+        }
         setTranscript(prev => [...prev, { source: 'user', text: userSpeech }]);
       }
     };
@@ -173,6 +192,7 @@ function Home() {
         camera: true
       });
       const persona = new Persona(sceneRef.current, sceneRef.current?.currentPersonaId);
+      personaInstanceRef.current = persona;
       persona.conversationSend('init', {
         userInfo: {
           name: userInfo?.name,
@@ -326,12 +346,9 @@ function Home() {
       <Card style={{ marginTop: 10, minHeight: '150px', maxHeight: '250px', overflowY: 'auto', border: '1px solid #ddd', padding: '10px', height: '250px' }}>
         {transcript.map((entry, i) => (
           <div key={i} style={{ marginBottom: 8 }}>
-			{ /* @ts-expect-error skip for now */}
             <strong style={{ color: entry.source === 'user' ? '#31839d' : '#ff8160' }}>
-				{ /* @ts-expect-error skip for now */}
               {entry.source === 'user' ? `${userInfo?.name}` : 'AVA'}
             </strong>{' '}
-			{ /* @ts-expect-error skip for now */}
             {entry.text}
           </div>
         ))}
