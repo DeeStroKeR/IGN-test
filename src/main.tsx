@@ -18,6 +18,7 @@ import PursedLipBreathing from './pages/PursedLipBreathing/PursedLipBreathing.ts
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "./theme.ts";
 import { ConfigProvider } from 'antd';
+import { UserProvider } from './contexts/UserContext.tsx';
 
 Amplify.configure(outputs);
 
@@ -62,28 +63,38 @@ createRoot(document.getElementById('root')!).render(
         theme={{
           token: {
             colorPrimary: '#31839d',
+            fontSize: 16
           },
           components: {
             Layout: {
               headerBg: '#31839d',
             },
             Menu: {
-              "horizontalItemHoverBg": "#31839d",
-              "horizontalItemSelectedBg": "#ffd3c8",
-              "horizontalItemSelectedColor": "#2a2e30",
-              "itemBg": "rgb(49,131,157)",
-              "itemColor": "rgba(255,255,255,0.65)",
-              "itemHoverBg": "#ffd3c8",
-              "itemHoverColor": "#fff",
+              itemColor: '#2a2e30',
+              itemSelectedColor: '#ffffff',
+              itemHoverColor: '#2a2e30',
+              itemBg: '#ffffff',
+              itemSelectedBg: '#31839d',
+              itemActiveBg: '#f0f0f0',
+              itemHeight: 48,
+              // motionDurationSlow: '0s',
+              // motionDurationMid: '0s',
+              // motionDurationFast: '0s',
             },
             Card: {
               padding: 0,
               paddingLG: 0
+            },
+            Button: {
+              paddingInline: 48,
+              controlHeight: 48,
             }
           }
         }}
       >
-        <RouterProvider router={router}/>
+        <UserProvider>
+          <RouterProvider router={router} />
+        </UserProvider>
       </ConfigProvider>
     </Authenticator>
   </StrictMode>,

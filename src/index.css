@@ -3,6 +3,74 @@ body {
   min-height: 100vh;
 }
 
+#root {
+  background: #f9fafb;
+}
+
+.ant-drawer-body {
+  padding: 0 !important;
+}
+
 [data-amplify-authenticator] {
   height: 100vh;
+}
+
+.ant-form-item-explain-error {
+  font-size: 14px;
+}
+
+[data-amplify-authenticator] {
+  --amplify-components-authenticator-router-box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px;
+  --amplify-components-authenticator-router-border-width: 0;
+  --amplify-internal-button-background-color: #31839d;
+}
+
+.amplify-button {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+}
+
+.amplify-input {
+  border: 1px solid rgb(209, 213, 219);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+[data-amplify-authenticator] [data-amplify-footer] {
+  padding-bottom: 0;
+}
+
+.amplify-button--link {
+  padding: 2px 6px;
+}
+
+.amplify-field__show-password {
+  border: 1px solid rgb(209, 213, 219);
+  border-left-width: 0;
+}
+
+.amplify-tabs__item {
+  color: #6b7280;
+  border-color: #e5e7eb;
+  border-width: 0 0 2px 0;
+}
+
+.amplify-tabs__item--active {
+  color: #31839d;
+  border-color: #31839d;
+  border-width: 0 0 2px 0;
+}
+
+.amplify-tabs__list {
+  padding: 16px 32px 0 32px;
+  border: none;
+}
+
+.amplify-tabs__panel {
+  padding: 0;
+}
+
+.amplify-button--primary {
+  margin-top: 8px;
 }

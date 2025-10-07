@@ -1,44 +1,36 @@
 import type { ProfileForm } from './profileTypes'
-import { Button, Form, Input, DatePicker, message, Select } from 'antd'
+import { Button, Form, Input, DatePicker, message, Select, ConfigProvider } from 'antd'
 import dayjs from 'dayjs'
 import { client } from '../http/client'
 import { useAuthenticator } from '@aws-amplify/ui-react-core';
 import { useEffect, useState } from 'react';
-import { Loader } from '@aws-amplify/ui-react';
+import styles from './profile.module.scss'
+import { useUser } from '../contexts/UserContext';
 
 const { TextArea } = Input;
 
 function Profile() {
-	const [userInfo, setUserInfo] = useState<ProfileForm | null>(null);
 	const [isFormLoading, setIsFormLoading] = useState<boolean>(false);
-	const [isInitDataLoading, setIsInitDataLoading] = useState<boolean>(true);
-	const { user } = useAuthenticator((context) => [context.user]);
+	const { user: cognitoUser } = useAuthenticator((context) => [context.user]);
+	const { user: userInfo, setUser, setLoading } = useUser();
 	const [form] = Form.useForm();
 
 	useEffect(() => {
-		getUserInfo(user.userId)
-	}, [user]);
-
-	const getUserInfo = async (userId: string) => {
-		const { data } = await client.models.User.get({ id: userId });
-		if (data) {
-			setUserInfo(data);
-			// Populate form with user info
+		if (userInfo) {
 			form.setFieldsValue({
-				name: data.name,
-				gender: data.gender,
-				birthday: dayjs(data.birthday),
-				aboutMe: data.aboutMe,
-				jobTitle: data.jobTitle,
-				jobDescription: data.jobDescription,
+				name: userInfo.name,
+				gender: userInfo.gender,
+				birthday: dayjs(userInfo.birthday),
+				aboutMe: userInfo.aboutMe,
+				jobTitle: userInfo.jobTitle,
+				jobDescription: userInfo.jobDescription,
 			});
 		}
-
-		setIsInitDataLoading(false);
-	}
+	}, [userInfo]);
 
 	const updateProfile = async (values: ProfileForm) => {
 		setIsFormLoading(true);
+		setLoading(true);
 		const data: ProfileForm = {
 			name: values.name,
 			gender: values.gender,
@@ -46,16 +38,26 @@ function Profile() {
 			jobDescription: values.jobDescription,
 			aboutMe: values.aboutMe,
 			birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
-			owner: user.userId,
+			owner: cognitoUser.userId,
 		}
 
-		setIsFormLoading(true);
-
 		if (userInfo) {
-			const { errors } = await client.models.User.update({
+			const {data: updatedUserInfo, errors } = await client.models.User.update({
 				...data,
 				id : userInfo.id || ''
 			})
+
+			if (updatedUserInfo && !errors) {
+				form.setFieldsValue({
+					name: updatedUserInfo.name,
+					gender: updatedUserInfo.gender,
+					birthday: dayjs(updatedUserInfo.birthday),
+					aboutMe: updatedUserInfo.aboutMe,
+					jobTitle: updatedUserInfo.jobTitle,
+					jobDescription: updatedUserInfo.jobDescription,
+				});
+				setUser(updatedUserInfo);
+			}
 
 			if (errors) {
 				message.error(errors[0].message);
@@ -63,10 +65,22 @@ function Profile() {
 				message.success('Profile updated successfully');
 			}
 		} else {
-			const { errors } = await client.models.User.create({
+			const {data: updatedUserInfo, errors } = await client.models.User.create({
 				...data,
-				id: user.userId
+				id: cognitoUser.userId
 			})
+
+			if (updatedUserInfo && !errors) {
+				form.setFieldsValue({
+					name: updatedUserInfo.name,
+					gender: updatedUserInfo.gender,
+					birthday: dayjs(updatedUserInfo.birthday),
+					aboutMe: updatedUserInfo.aboutMe,
+					jobTitle: updatedUserInfo.jobTitle,
+					jobDescription: updatedUserInfo.jobDescription,
+				});
+				setUser(updatedUserInfo);
+			}
 
 			if (errors) {
 				message.error(errors[0].message);
@@ -76,89 +90,107 @@ function Profile() {
 		}
 
 		setIsFormLoading(false);
-	}
-
-	if (isInitDataLoading) {
-		return <Loader />;
+		setLoading(false);
 	}
 
 	return (
 		<>
-			<h1>Profile</h1>
-			<p style={{ fontWeight: 'bold'}}>{userInfo ? 'Update your profile information below:' : 'To start use application please update information about yourself'}</p>
-			<Form
-				name="basic"
-				form={form}
-				disabled={isFormLoading}
-				labelCol={{ span: 8 }}
-				wrapperCol={{ span: 16 }}
-				style={{ maxWidth: 800 }}
-				initialValues={{ remember: true, ...userInfo }}
-				onFinish={updateProfile}
-				// onFinishFailed={onFinishFailed}
-				autoComplete="off"
-			>
-				<Form.Item<ProfileForm>
-					label="Name/Nickname"
-					name="name"
-					rules={[{ required: true, message: 'Please input your name!' }]}
+			<h1 className={styles.header}>Profile</h1>
+			{!userInfo && <p className={styles.subheader}>To start use application please update information about yourself</p>}
+			<ConfigProvider theme={{
+				components: {
+					Form: {
+						labelFontSize: 14,
+						fontSize: 16,
+					},
+					Input: {
+						fontSizeLG: 16,
+					},
+					Select: {
+						fontSizeLG: 16,
+					},
+					DatePicker: {
+						fontSizeLG: 16,
+					},
+					Button: {
+						controlHeight: 40,
+					}
+				} 
+			}}>
+				<Form
+					name="basic"
+					form={form}
+					disabled={isFormLoading}
+					// labelCol={{ span: 16 }}
+					// wrapperCol={{ span: 32 }}
+					// initialValues={{ remember: true, ...userInfo }}
+					onFinish={updateProfile}
+					layout='vertical'
+					// onFinishFailed={onFinishFailed}
+					autoComplete="off"
 				>
-					<Input />
-				</Form.Item>
+					<Form.Item<ProfileForm>
+						label="Name/Nickname"
+						name="name"
+						rules={[{ required: true, message: 'Please input your name!' }]}
+					>
+						<Input size="large" />
+					</Form.Item>
+		
+					<Form.Item<ProfileForm>
+						label="Gender"
+						name="gender"
+						rules={[{ required: true, message: 'Please select your gender!' }]}
+					>
+						<Select size="large" placeholder="Select your gender">
+							<Select.Option value="male">Male</Select.Option>
+							<Select.Option value="female">Female</Select.Option>
+							<Select.Option value="non binary">Non-binary</Select.Option>
+							<Select.Option value="not specified">Not specified</Select.Option>
+						</Select>
+					</Form.Item>
+		
+					<Form.Item<ProfileForm>
+						label="Date of birth"
+						name="birthday"
+						rules={[{ required: true, message: 'Please select your birthday!' }]}
+					>
+						<DatePicker size='large' style={{ width: '100%' }} disabledDate={(current) => current && current > dayjs().endOf('day')} />
+					</Form.Item>
 	
-				<Form.Item<ProfileForm>
-					label="Gender"
-					name="gender"
-					rules={[{ required: true, message: 'Please select your gender!' }]}
-				>
-					<Select>
-						<Select.Option value="male">Male</Select.Option>
-						<Select.Option value="female">Female</Select.Option>
-						<Select.Option value="non binary">Non-binary</Select.Option>
-						<Select.Option value="not specified">Not specified</Select.Option>
-					</Select>
-				</Form.Item>
+					<p style={{ fontWeight: 'bold'}}>If you're comfortable with it, share some more info about yourself</p>
 	
-				<Form.Item<ProfileForm>
-					label="Date of birth"
-					name="birthday"
-					rules={[{ required: true, message: 'Please select your birthday!' }]}
-				>
-					<DatePicker disabledDate={(current) => current && current > dayjs().endOf('day')} />
-				</Form.Item>
-
-				<p style={{ fontWeight: 'bold'}}>If you're comfortable with it, share some more info about yourself</p>
-
-				<Form.Item<ProfileForm>
-					label="What are your hobbies and interests?"
-					name="aboutMe"
-					colon={false}
-				>
-					<TextArea rows={4} />
-				</Form.Item>
-	
-				<Form.Item<ProfileForm>
-					label="What's your job?"
-					name="jobTitle"
-					colon={false}
-				>
-					<Input />
-				</Form.Item>
-	
-				<Form.Item<ProfileForm>
-					label="How would you describe your job?"
-					name="jobDescription"
-					colon={false}
-				>
-					<TextArea rows={4} />
-				</Form.Item>
-	
-				<Form.Item label={null}>
-					<Button type="primary" htmlType="submit" loading={isFormLoading} disabled={isFormLoading}>
-						Submit
-					</Button>
-				</Form.Item>
-			</Form>
+					<Form.Item<ProfileForm>
+						label="What are your hobbies and interests?"
+						name="aboutMe"
+						colon={false}
+					>
+						<TextArea rows={4} />
+					</Form.Item>
+		
+					<Form.Item<ProfileForm>
+						label="What's your job?"
+						name="jobTitle"
+						colon={false}
+					>
+						<Input size="large" />
+					</Form.Item>
+		
+					<Form.Item<ProfileForm>
+						label="How would you describe your job?"
+						name="jobDescription"
+						colon={false}
+					>
+						<TextArea rows={4} />
+					</Form.Item>
+		
+					<Form.Item label={null}>
+						<Button type="primary" size="middle" htmlType="submit" loading={isFormLoading} disabled={isFormLoading}>
+							Save
+						</Button>
+					</Form.Item>
+				</Form>
+			</ConfigProvider>
 		</>
 	)
 }

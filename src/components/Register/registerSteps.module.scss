@@ -1,0 +1,93 @@
+.wrapper {
+  min-height: 100vh;
+  background-color: rgb(249, 250, 251);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 28rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px;
+  padding: 32px;
+}
+
+.steps_indicator {
+  &_wrapper {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  &_step {
+    flex: 1 1 0%;
+    height: 8px;
+    border-radius: 9999px;
+    background-color: rgb(229, 231, 235);
+
+    &_completed {
+      background-color: rgb(49, 131, 157);
+    }
+  }
+}
+
+.greetings {
+  &_title {
+    font-size: 30px;
+    margin: 0 0 24px 0;
+    text-align: center;
+    font-weight: bold;
+    color: rgb(42, 46, 48);
+  }
+
+  &_text {
+    text-align: center;
+    font-size: 20px;
+    margin: 0;
+    color: rgb(75, 85, 99);
+  }
+}
+
+.step {
+  &_title {
+    font-size: 24px;
+    margin: 0 0 16px 0;
+    font-weight: 600;
+    color: rgb(42, 46, 48);
+  }
+
+  &_text {
+    font-size: 20px;
+    color: rgb(75, 85, 99);
+  }
+}
+
+.info {
+  &_wrapper {
+    background-color: rgb(249, 250, 251);
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &_text {
+    font-size: 14px;
+    margin: 0;
+
+    &_accent {
+      font-weight: 600;
+    }
+  }
+}
+
+.button {
+  width: 100%;
+  margin-top: 32px;
+}

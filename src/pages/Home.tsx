@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Loader } from '@aws-amplify/ui-react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import type { ProfileForm } from './profileTypes';
-import { client } from '../http/client';
 import { useNavigate } from 'react-router';
 import { Scene, Persona, ConnectionStateData, ConversationResultResponseBody } from '@soulmachines/smwebsdk';
 import { Button, Card } from 'antd';
 import { SceneResponse } from '@soulmachines/smwebsdk/lib-esm/websocket-message/scene/SceneResponse';
+import styles from './home.module.scss';
+import { useUser } from '../contexts/UserContext';
 
 const apiKey =
   'eyJzb3VsSWQiOiJkZG5hLWlndHBhbHRkLS10ZXN0cHJvamVjdCIsImF1dGhTZXJ2ZXIiOiJodHRwczovL2RoLnNvdWxtYWNoaW5lcy5jbG91ZC9hcGkvand0IiwiYXV0aFRva2VuIjoiYXBpa2V5X3YxXzg5ODUxNjQ3LWE5MmYtNGZhNC1iZDllLTBiMWZhZDg3YWFkZCJ9';
@@ -21,11 +20,18 @@ interface TranscriptEntry {
   text: string;
 }
 
-function Home() {
-	const { user } = useAuthenticator((context) => [context.user]);
-	const [isUserLoading, setIsUserLoading] = useState<boolean>(true);
-	const [userInfo, setUserInfo] = useState<ProfileForm | null>(null);
+function UserMessage({ text, userName }: { text: string, userName: string }) {
+  return <div className={styles.userMessage}>
+    <p className={styles.userMessage_message}><span className={styles.userMessage_message_label}>{userName}</span> {text}</p></div>
+}
 
+function PersonaMessage({ text }: { text: string }) {
+  return <div className={styles.personaMessage}>
+    <p className={styles.personaMessage_message}><span className={styles.personaMessage_message_label}>AVA</span> {text}</p></div>
+}
+
+function Home() {
+	const { user: cognitoUser } = useAuthenticator((context) => [context.user]);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const sceneRef = useRef<Scene | null>(null);
   const personaInstanceRef = useRef<Persona | null>(null);
@@ -34,13 +40,11 @@ function Home() {
 	// const [inputText, setInputText] = useState('');
   const [loadProgress, setLoadProgress] = useState(0);
   const [isPersonLoading, setIsPersonLoading] = useState<boolean>(false);
+  const [showPersona, setShowPersona] = useState<boolean>(false);
   const [error, setError] = useState<string | null>();
+  const { user: userInfo } = useUser();
 	const navigate = useNavigate();
 	
-	useEffect(() => {
-		getUserInfo(user.userId)
-	}, [user]);
-
 	useEffect(() => {
     if (!sceneRef.current) return;
 
@@ -75,7 +79,7 @@ function Home() {
               jobDescription: userInfo?.jobDescription,
               aboutMe: userInfo?.aboutMe,
               birthday: userInfo?.birthday,
-              id: user.userId,
+              id: cognitoUser.userId,
             }
           },
             { kind: 'userTalk' });
@@ -157,19 +161,8 @@ function Home() {
   };
 }, [sceneRef.current]);
 
-	const getUserInfo = async (userId: string) => {
-		const { data, errors } = await client.models.User.get({ id: userId });
-		if (data) {
-      setUserInfo(data);
-			setIsUserLoading(false);
-		}
-
-		if (errors || !data) {
-			navigate('/profile');
-		}
-	}
-
 	const connect = async () => {
+    setShowPersona(true);
     setIsPersonLoading(true);
     if (!videoRef.current) {
       console.warn('Video element not mounted yet');
@@ -201,7 +194,7 @@ function Home() {
           jobDescription: userInfo?.jobDescription,
           aboutMe: userInfo?.aboutMe,
           birthday: userInfo?.birthday,
-          id: user.userId,
+          id: cognitoUser.userId,
         }
       }, {
         kind: 'init'
@@ -214,7 +207,7 @@ function Home() {
           jobDescription: userInfo?.jobDescription,
           aboutMe: userInfo?.aboutMe,
           birthday: userInfo?.birthday,
-          id: user.userId,
+          id: cognitoUser.userId,
         }
       });
 
@@ -283,9 +276,10 @@ function Home() {
 
   const reset = () => {
     if (sceneRef.current) {
+      setShowPersona(false);
+      setTranscript([]);
       sceneRef.current.disconnect();
       sceneRef.current = null;
-      // setTranscript([]);
     }
     setStatus('Disconnected');
   };
@@ -299,65 +293,62 @@ function Home() {
 //   setInputText('');
 // };
 
-	if (isUserLoading) {
-		return <Loader />;
-	}
-
-
 	return (
-		<div>
-			<p style={{ fontWeight: 'bold' }}>Welcome, {userInfo?.name}. To start, click ‘CONNECT’</p>
-			<div>
-      <Card style={{ width: '640px', height: '320px', overflow: 'hidden', margin: '0 auto' }}>
-        <video
-          ref={videoRef}
-          id="sm-video"
-          width="100%"
-          height="100%"
-          autoPlay
-          playsInline
-          style={{ opacity: transcript.length > 0 ? 1 : 0 }}
-        />
-      </Card>
+		<>
+      {!showPersona && <>
+        <p className={styles.greeting}>Welcome, {userInfo?.name}</p>
+        <p className={styles.heading}>Ava is ready to chat whenever you are.</p>
+      </>}
+        <>
+          {<video
+            className={styles.video}
+            ref={videoRef}
+            id="sm-video"
+            width="100%"
+            height="100%"
+            autoPlay
+            playsInline
+            style={{ opacity: status === 'Connected' && showPersona ? 1 : 0 }}
+          />}
 
-      <div style={{ margin: "10px auto 0 auto", width: 'fit-content' }}>
-        <Button type="primary" disabled={isPersonLoading || status === 'Connected'} onClick={connect}>CONNECT</Button>
-        <Button onClick={reset} style={{ marginLeft: 10 }}>
-          Disconnect
-        </Button>
-      </div>
-      {/* use persona.conversationSend to send text to backend. also need write logic to handle this messages because this messages has another type of message name */}
-      {/* <div style={{ marginTop: 10 }}>
-        <Input
-          type="text"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-          placeholder="Type your message here"
-          style={{ width: '400px' }}
-          onKeyDown={e => {
-            if (e.key === 'Enter') sendMessage();
-          }}
-        />
-        <Button type="primary" onClick={sendMessage} style={{ marginLeft: 5 }}>
-          Send
-        </Button>
-      </div> */}
-      <p>iGT-PA! is a self-help app we are not clinicians and are not qualified therapists. We cannot offer clinical support for your condition, but we can send valuable insights to your GP or professional therapist. What we can do is support you to manage your anxiety levels which may ease the impact your condition has on you.</p>
-      <Card style={{ marginTop: 10, minHeight: '150px', maxHeight: '250px', overflowY: 'auto', border: '1px solid #ddd', padding: '10px', height: '250px' }}>
-        {transcript.map((entry, i) => (
-          <div key={i} style={{ marginBottom: 8 }}>
-            <strong style={{ color: entry.source === 'user' ? '#31839d' : '#ff8160' }}>
-              {entry.source === 'user' ? `${userInfo?.name}` : 'AVA'}
-            </strong>{' '}
-            {entry.text}
-          </div>
-        ))}
-      </Card>
+        <div className={styles.buttons}>
+          {status !== 'Connected' && <Button type="primary" disabled={isPersonLoading || status === 'Connected'} onClick={connect}>Talk</Button>}
+          {status === 'Connected' && <Button type="primary" onClick={reset} style={{ marginLeft: 10 }}>
+            End conversation
+          </Button>}
+        </div>
+        {/* use persona.conversationSend to send text to backend. also need write logic to handle this messages because this messages has another type of message name */}
+        {/* <div style={{ marginTop: 10 }}>
+          <Input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="Type your message here"
+            style={{ width: '400px' }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') sendMessage();
+            }}
+          />
+          <Button type="primary" onClick={sendMessage} style={{ marginLeft: 5 }}>
+            Send
+          </Button>
+        </div> */}
 
-      <div style={{ marginTop: 10 }}>Status: <span style={{ fontWeight: 'bold' }}>{status}</span>{(status === 'Connected' && transcript.length < 1) && ` loading avatar...`}{loadProgress > 0 && loadProgress < 100 && ` (Loading: ${loadProgress}%)`}</div>
-      {error && <p><span style={{ color: 'red', fontWeight: 'bold' }}>Error:</span> {error}</p>}
-    </div>
-		</div>
+        {!showPersona && <div className={styles.disclaimer}>
+          <p className={styles.disclaimer_text}>iGT-PA! is a self-help app we are not clinicians and are not qualified therapists. We cannot offer clinical support for your condition, but we can send valuable insights to your GP or professional therapist. What we can do is support you to manage your anxiety levels which may ease the impact your condition has on you.</p>
+        </div>}
+        {showPersona && <Card style={{ marginTop: 10, minHeight: '150px', maxHeight: '250px', overflowY: 'auto', border: '1px solid #ddd', padding: '10px', height: '250px' }}>
+          {transcript.map((entry, i) => (
+            <div key={i} style={{ marginBottom: 8 }}>
+              {entry.source === 'user' ? <UserMessage text={entry.text} userName={userInfo?.name || 'Anonymous'} /> : <PersonaMessage text={entry.text} />}
+            </div>
+          ))}
+        </Card>}
+
+        <div style={{ marginTop: 10 }}>Status: <span style={{ fontWeight: 'bold' }}>{status}</span>{(status === 'Connected' && transcript.length < 1) && ` loading avatar...`}{loadProgress > 0 && loadProgress < 100 && ` (Loading: ${loadProgress}%)`}</div>
+        {error && <p><span style={{ color: 'red', fontWeight: 'bold' }}>Error:</span> {error}</p>}
+      </>
+		</>
 	)
 }
 
