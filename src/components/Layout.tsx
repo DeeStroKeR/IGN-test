@@ -4,13 +4,14 @@ import { Outlet } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 import { signOut } from 'aws-amplify/auth';
 import { useEffect, useState } from 'react';
-import { CloseOutlined, MenuOutlined, HomeOutlined, UserOutlined, HeartOutlined, InfoOutlined } from '@ant-design/icons';
+import { CloseOutlined, MenuOutlined, HomeOutlined, UserOutlined, HeartOutlined, InfoOutlined, QuestionOutlined } from '@ant-design/icons';
 import styles from './layout.module.scss';
 import { useUser } from '../contexts/UserContext';
 import { client } from '../http/client';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import RegisterSteps from './Register/RegisterSteps';
 import { ProfileForm } from '../pages/profileTypes';
+import { DualRingLoader } from './DualRingLoader';
 
 const { Header, Content, Footer } = AntLayout;
 const pages: MenuProps['items'] = [
@@ -95,7 +96,7 @@ function Layout() {
 	}
 
 	if (!user && !showStepper) {
-		return <div>Loading...</div>;
+		return <DualRingLoader text="Loading user information..." size={80}/>;
 	}
 
 	if (!user && showStepper) {
@@ -103,8 +104,6 @@ function Layout() {
 			<RegisterSteps onComplete={onCompleteStepper} />
 		)
 	}
-
-	console.log('User in layout:', user, showStepper);
 
 	return (
 		<AntLayout style={{ minHeight: '100vh' }}>
@@ -120,6 +119,7 @@ function Layout() {
 					disabled={isLoading}
 					onClick={() => setCollapsed(true)}
 				/>
+				<a href="mailto:info@igt-pa.co.uk" className={styles.help_link}><QuestionOutlined className={styles.help_icon}/> Request help</a>
 				<div className={styles.logout_wrapper}>
 					<ConfigProvider
 						theme={{

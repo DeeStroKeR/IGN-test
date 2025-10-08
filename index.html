@@ -1,13 +1,50 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="igt.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>iGT-PA</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="igt.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iGT-PA</title>
+</head>
+
+<body>
+  <div id="root">
+    <div
+      style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; height: 100vh;">
+      <div style="width: 80px; height: 80px; position: relative;">
+        <div
+          style="position: absolute; width: 100%; height: 100%; border-width: 3px; border-style: solid; border-color: rgb(51, 166, 191) transparent rgb(51, 166, 191) rgb(51, 166, 191); border-image: initial; border-radius: 50%; animation: 1.5s linear 0s infinite normal none running rotate;">
+        </div>
+        <div
+          style="position: absolute; width: 70%; height: 70%; top: 15%; left: 15%; border-width: 3px; border-style: solid; border-color: rgb(255, 129, 96) rgb(255, 129, 96) rgb(255, 129, 96) transparent; border-image: initial; border-radius: 50%; animation: 1s linear 0s infinite normal none running rotate-reverse;">
+        </div>
+      </div>
+      <p style="color: rgb(42, 46, 48); font-size: 14px; font-weight: 500;">Initializing application...</p>
+      <style>
+        @keyframes rotate {
+          0% {
+            transform: rotate(0deg);
+          }
+
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes rotate-reverse {
+          0% {
+            transform: rotate(0deg);
+          }
+
+          100% {
+            transform: rotate(-360deg);
+          }
+        }
+      </style>
+    </div>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

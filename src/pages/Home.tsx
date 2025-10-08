@@ -7,8 +7,10 @@ import { SceneResponse } from '@soulmachines/smwebsdk/lib-esm/websocket-message/
 import styles from './home.module.scss';
 import { useUser } from '../contexts/UserContext';
 
+// const apiKey =
+//   'eyJzb3VsSWQiOiJkZG5hLWlndHBhbHRkLS10ZXN0cHJvamVjdCIsImF1dGhTZXJ2ZXIiOiJodHRwczovL2RoLnNvdWxtYWNoaW5lcy5jbG91ZC9hcGkvand0IiwiYXV0aFRva2VuIjoiYXBpa2V5X3YxXzg5ODUxNjQ3LWE5MmYtNGZhNC1iZDllLTBiMWZhZDg3YWFkZCJ9';
 const apiKey =
-  'eyJzb3VsSWQiOiJkZG5hLWlndHBhbHRkLS10ZXN0cHJvamVjdCIsImF1dGhTZXJ2ZXIiOiJodHRwczovL2RoLnNvdWxtYWNoaW5lcy5jbG91ZC9hcGkvand0IiwiYXV0aFRva2VuIjoiYXBpa2V5X3YxXzg5ODUxNjQ3LWE5MmYtNGZhNC1iZDllLTBiMWZhZDg3YWFkZCJ9';
+  'eyJzb3VsSWQiOiJkZG5hLWlndHBhbHRkLS1wYS1maW5uIiwiYXV0aFNlcnZlciI6Imh0dHBzOi8vZGguc291bG1hY2hpbmVzLmNsb3VkL2FwaS9qd3QiLCJhdXRoVG9rZW4iOiJhcGlrZXlfdjFfNzhkNWJlMTItODE0My00NDIwLWI3MTgtMWM1ZDUzOTYxNTliIn0=';
 
 interface Exercise {
   type: string;
@@ -27,7 +29,7 @@ function UserMessage({ text, userName }: { text: string, userName: string }) {
 
 function PersonaMessage({ text }: { text: string }) {
   return <div className={styles.personaMessage}>
-    <p className={styles.personaMessage_message}><span className={styles.personaMessage_message_label}>AVA</span> {text}</p></div>
+    <p className={styles.personaMessage_message}><span className={styles.personaMessage_message_label}>Phil</span> {text}</p></div>
 }
 
 function Home() {
@@ -35,6 +37,7 @@ function Home() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const sceneRef = useRef<Scene | null>(null);
   const personaInstanceRef = useRef<Persona | null>(null);
+  const transcriptRef = useRef<HTMLDivElement | null>(null);
   const [status, setStatus] = useState('Disconnected');
 	const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
 	// const [inputText, setInputText] = useState('');
@@ -44,6 +47,13 @@ function Home() {
   const [error, setError] = useState<string | null>();
   const { user: userInfo } = useUser();
 	const navigate = useNavigate();
+	
+	// Auto-scroll to bottom when transcript updates
+	useEffect(() => {
+		if (transcriptRef.current) {
+			transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight;
+		}
+	}, [transcript]);
 	
 	useEffect(() => {
     if (!sceneRef.current) return;
@@ -159,7 +169,7 @@ function Home() {
 
     
   };
-}, [sceneRef.current]);
+}, [navigate]);
 
 	const connect = async () => {
     setShowPersona(true);
@@ -337,7 +347,9 @@ function Home() {
         {!showPersona && <div className={styles.disclaimer}>
           <p className={styles.disclaimer_text}>iGT-PA! is a self-help app we are not clinicians and are not qualified therapists. We cannot offer clinical support for your condition, but we can send valuable insights to your GP or professional therapist. What we can do is support you to manage your anxiety levels which may ease the impact your condition has on you.</p>
         </div>}
-        {showPersona && <Card style={{ marginTop: 10, minHeight: '150px', maxHeight: '250px', overflowY: 'auto', border: '1px solid #ddd', padding: '10px', height: '250px' }}>
+        {showPersona && <Card 
+          ref={transcriptRef}
+          style={{ marginTop: 10, minHeight: '150px', maxHeight: '250px', overflowY: 'auto', border: '1px solid #ddd', padding: '10px', height: '250px' }}>
           {transcript.map((entry, i) => (
             <div key={i} style={{ marginBottom: 8 }}>
               {entry.source === 'user' ? <UserMessage text={entry.text} userName={userInfo?.name || 'Anonymous'} /> : <PersonaMessage text={entry.text} />}

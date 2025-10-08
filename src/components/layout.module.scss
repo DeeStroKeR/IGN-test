@@ -86,9 +86,22 @@
   }
 }
 
+.help {
+  &_link {
+    color: #2a2e30 !important;
+    line-height: 48px;
+    margin: auto 4px 8px 4px;
+    padding: 0 16px;
+    border-radius: 8px;
+
+    &:hover {
+      background: #0000000f;
+    }
+  }
+}
+
 .logout {
   &_wrapper {
-    margin-top: auto;
     padding: 16px;
     border-top: 1px solid rgb(229, 231, 235);
   }
