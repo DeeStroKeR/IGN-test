@@ -17,6 +17,23 @@ const useStyles = makeStyles({
       background: "#ddd",
     },
   },
+  title: {},
+  description: {},
+  "@media (max-width: 768px)": {
+    paper: {
+      padding: "0",
+      marginTop: "16px"
+    },
+    box: {
+      padding: "1rem !important",
+    },
+    title: {
+      fontSize: '24px !important',
+    },
+    description: {
+      textAlign: 'justify',
+    },
+  },
 });
 
 interface MenuItemProps {
@@ -45,10 +62,11 @@ const MenuItem: React.FC<MenuItemProps> = ({ name, description, link }) => {
             variant="h4"
             fontWeight={700}
             gutterBottom
+            className={classes.title}
           >
             {name}
           </Typography>
-          <Typography color="inherit" variant="body1">
+          <Typography color="inherit" variant="body1" className={classes.description}>
             {description}
           </Typography>
         </Box>

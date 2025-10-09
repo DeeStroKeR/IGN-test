@@ -19,7 +19,10 @@ const pages: MenuProps['items'] = [
   { key: '/profile', label: <Link to="/profile">Profile</Link>, icon: <UserOutlined /> },
   { type: 'divider' },
   { key: 'exercises', label: 'Well-being Tools', type: 'group' },
-  { key: '/breathe', label: <Link to="/breathe">Take a Breather</Link>, icon: <HeartOutlined /> }
+  { key: '/breathe', label: <Link to="/breathe">Take a Breather</Link>, icon: <HeartOutlined /> },
+  { key: '/moving', label: <Link to="/">Get Moving</Link>, disabled: true, icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-activity" style={{ width: '16px', height: '16px' }}><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg> },
+  { key: '/daily', label: <Link to="/">Daily Rhythm</Link>, disabled: true, icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar" style={{ width: '16px', height: '16px' }}><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg> },
+  { key: '/disconnect', label: <Link to="/">Disconnect and Connect</Link>, disabled: true, icon: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-wifi-off" style={{ width: '16px', height: '16px' }}><path d="M12 20h.01"></path><path d="M8.5 16.429a5 5 0 0 1 7 0"></path><path d="M5 12.859a10 10 0 0 1 5.17-2.69"></path><path d="M19 12.859a10 10 0 0 0-2.007-1.523"></path><path d="M2 8.82a15 15 0 0 1 4.177-2.643"></path><path d="M22 8.82a15 15 0 0 0-11.288-3.764"></path><path d="m2 2 20 20"></path></svg> },
   // Add more pages as needed
 ];
 
@@ -139,7 +142,7 @@ function Layout() {
 				</div>
 			</Drawer>
 		<AntLayout>	
-			<Header style={{ display: 'flex', alignItems: 'center', height: '56px', padding: '0 16px' }}>
+			<Header style={{ display: 'flex', alignItems: 'center', height: '56px', padding: '0 16px', position: 'sticky', top: 0, zIndex: 1, width: '100%' }}>
 				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', margin: '0 auto' }}>
 					<MenuOutlined onClick={() => setCollapsed(false)} style={{ color: 'white' }} />
 					<h1 className={styles.header_header}>iGT-PA!</h1>

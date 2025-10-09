@@ -7,11 +7,11 @@ import { useNavigate } from "react-router-dom";
 function Toolbar({ title }: { title: string }) {
   const navigate = useNavigate();
   return (
-    <Box display="flex" marginBottom="1.5rem">
+    <Box display="flex" alignItems="center" marginBottom="1.5rem">
       <IconButton onClick={() => {navigate(-1)}} color="inherit" size="large">
         <KeyboardBackspaceIcon fontSize="large" />
       </IconButton>
-      <Typography variant="h3" fontWeight="700" marginLeft="1rem" noWrap>
+      <Typography variant="h3" fontWeight="700" marginLeft="1rem" fontSize={{ xs: '24px', lg: '48px' }}>
         {title}
       </Typography>
     </Box>

@@ -17,6 +17,18 @@ const useStyles = makeStyles({
     marginTop: "1.5rem",
     alignSelf: "center",
   },
+  icon: {},
+    "@media (max-width: 768px)": {
+      paper: {
+        padding: "0",
+      },
+      icon: {
+        minWidth: '24px !important',
+        '& svg': {
+          fontSize: '16px !important',
+        }
+      },
+    },
 });
 
 const steps = [
@@ -55,7 +67,7 @@ const Description = ({ setStart }: DescriptionProps) => {
           {steps.map((step, index) => {
             return (
               <ListItem key={index}>
-                <ListItemIcon>
+                <ListItemIcon className={classes.icon}>
                   <FiberManualRecordIcon />
                 </ListItemIcon>
                 <ListItemText primary={step} />

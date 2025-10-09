@@ -96,6 +96,14 @@ const useStyles = makeStyles((theme: Theme) => ({
       fontSize: "1rem",
     },
   },
+  "@media (max-width: 768px)": {
+    time: {
+      fontSize: "32px !important",
+    },
+    variant: {
+      fontSize: "16px !important",
+    },
+  },
 }));
 
 export type AnimationClass = "breatheIn" | "breatheOut" | "holdIn" | "holdOut";

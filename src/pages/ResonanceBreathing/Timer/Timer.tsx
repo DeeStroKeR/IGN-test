@@ -8,6 +8,11 @@ const useStyles = makeStyles({
   paper: {
     padding: "1rem",
   },
+  "@media (max-width: 768px)": {
+    paper: {
+      padding: "0",
+    },
+  },
 });
 
 const Timer = () => {

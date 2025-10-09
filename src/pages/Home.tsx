@@ -29,7 +29,7 @@ function UserMessage({ text, userName }: { text: string, userName: string }) {
 
 function PersonaMessage({ text }: { text: string }) {
   return <div className={styles.personaMessage}>
-    <p className={styles.personaMessage_message}><span className={styles.personaMessage_message_label}>Phil</span> {text}</p></div>
+    <p className={styles.personaMessage_message}><span className={styles.personaMessage_message_label}>Finn</span> {text}</p></div>
 }
 
 function Home() {
@@ -314,8 +314,6 @@ function Home() {
             className={styles.video}
             ref={videoRef}
             id="sm-video"
-            width="100%"
-            height="100%"
             autoPlay
             playsInline
             style={{ opacity: status === 'Connected' && showPersona ? 1 : 0 }}
