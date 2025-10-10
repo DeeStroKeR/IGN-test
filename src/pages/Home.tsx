@@ -64,6 +64,7 @@ function Home() {
       const personaState = event.persona?.['1'];
       if (personaState?.speechState === 'speaking') {
         const personaSpeech = personaState.currentSpeech;
+        console.log('Persona is speaking:', personaSpeech);
         if (personaSpeech) {
           if (!scene.isMicrophoneActive()) {
             console.log('Setting microphone active');
@@ -130,6 +131,7 @@ function Home() {
   }, [sceneRef.current]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    console.log('Setting up custom scene message handler');
   const scene = sceneRef.current;
   if (!scene) return;
 
@@ -141,6 +143,7 @@ function Home() {
     if (message.name === 'conversationResult') {
       console.log('conversationResult:', message);
       const body = message.body as ConversationResultResponseBody;
+      console.log('conversationResult:', message.body);
       if (
         body &&
         body.output &&
@@ -169,7 +172,7 @@ function Home() {
 
     
   };
-}, [navigate]);
+}, [sceneRef.current]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const connect = async () => {
     setShowPersona(true);
