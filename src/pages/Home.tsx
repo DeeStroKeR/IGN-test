@@ -330,7 +330,15 @@ function Home() {
           owner: cognitoUser.userId
         });
         
-        console.log('✅ SAVE: Conversation saved successfully!', result);
+        console.log('✅ SAVE: Conversation save result:', result);
+        if (result.errors && result.errors.length > 0) {
+          console.error('❌ SAVE: Save failed with errors:', result.errors);
+          result.errors.forEach((err, i) => {
+            console.error(`❌ SAVE: Error ${i + 1}:`, err);
+          });
+        } else if (result.data) {
+          console.log('✅ SAVE: Conversation saved successfully!', result.data);
+        }
         
         // Trigger a page reload to refresh conversation list (temporary solution)
         setTimeout(() => {
