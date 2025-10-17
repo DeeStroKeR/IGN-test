@@ -161,7 +161,7 @@ function Layout() {
 				</div>
 			</Content>
 			<Footer className={styles.footer}>
-				IGT ©{new Date().getFullYear()}
+				iGT-PA Ltd ©{new Date().getFullYear()}
 			</Footer>
 		</AntLayout>
 		<Modal

@@ -29,7 +29,7 @@ function UserMessage({ text, userName }: { text: string, userName: string }) {
 
 function PersonaMessage({ text }: { text: string }) {
   return <div className={styles.personaMessage}>
-    <p className={styles.personaMessage_message}><span className={styles.personaMessage_message_label}>Finn</span> {text}</p></div>
+    <p className={styles.personaMessage_message}><span className={styles.personaMessage_message_label}>Jack</span> {text}</p></div>
 }
 
 function Home() {
@@ -310,7 +310,7 @@ function Home() {
 		<>
       {!showPersona && <>
         <p className={styles.greeting}>Welcome, {userInfo?.name}</p>
-        <p className={styles.heading}>Ava is ready to chat whenever you are.</p>
+        <p className={styles.heading}>Jack is ready to chat whenever you are.</p>
       </>}
         <>
           {<video
