@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { Card, Modal } from 'antd';
-import { ArrowRightOutlined, MessageOutlined } from '@ant-design/icons';
+import { MessageOutlined } from '@ant-design/icons';
 import { client } from '../../http/client';
 import { useUser } from '../../contexts/UserContext';
 import styles from './chatHistory.module.scss';
@@ -95,25 +95,17 @@ function ChatHistory() {
       ) : (
         <div className={styles.conversationsList}>
           {conversations.map((conversation) => (
-            <Card 
+            <div 
               key={conversation.id}
               className={styles.conversationCard}
-              hoverable
               onClick={() => handleConversationClick(conversation)}
             >
-              <div className={styles.conversationHeader}>
-                <div className={styles.conversationDate}>
-                  <div className={styles.date}>{formatDate(conversation.createdAt)}</div>
-                  <div className={styles.time}>{formatTime(conversation.createdAt)}</div>
-                </div>
-                <ArrowRightOutlined className={styles.arrow} />
+              <div className={styles.date}>{formatDate(conversation.createdAt)}</div>
+              <div className={styles.time}>{formatTime(conversation.createdAt)}</div>
+              <div className={styles.messageCount}>
+                {conversation.messageCount} message{conversation.messageCount !== 1 ? 's' : ''} →
               </div>
-              <div className={styles.conversationInfo}>
-                <div className={styles.messageCount}>
-                  {conversation.messageCount} message{conversation.messageCount !== 1 ? 's' : ''} →
-                </div>
-              </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
