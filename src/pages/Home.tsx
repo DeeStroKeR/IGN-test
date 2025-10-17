@@ -347,7 +347,7 @@ function Home() {
         </div> */}
 
         {!showPersona && <div className={styles.disclaimer}>
-          <p className={styles.disclaimer_text}>iGT-PA! is a self-help app we are not clinicians and are not qualified therapists. We cannot offer clinical support for your condition, but we can send valuable insights to your GP or professional therapist. What we can do is support you to manage your anxiety levels which may ease the impact your condition has on you.</p>
+          <p className={styles.disclaimer_text}>I Got This! is a self-help application, we are not clinicians and are not qualified therapists. We cannot offer clinical support for your condition, but we can send valuable insights to your GP or professional therapist but only with your consent. What we can do is support you to manage your anxiety levels which may ease the impact your condition has on you.</p>
         </div>}
         {showPersona && <Card 
           ref={transcriptRef}

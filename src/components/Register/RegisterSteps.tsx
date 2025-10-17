@@ -45,7 +45,7 @@ function RegisterSteps({ onComplete }: RegisterStepsProps) {
 
 	const steps: IRegisterSteps[] = [
 		{
-			title: <h1 className={styles.greetings_title}>Welcome to iGT!</h1>,
+			title: <h1 className={styles.greetings_title}>Welcome to I Got This!</h1>,
 			content: <p className={styles.greetings_text}>It’s all about you</p>,
 			button: 'Get Started'
 		},
@@ -92,9 +92,9 @@ function RegisterSteps({ onComplete }: RegisterStepsProps) {
 		{
 			title: <h1 className={styles.step_title}>Important Notice</h1>,
 			content: <div className={styles.info_wrapper}>
-				<p className={`${styles.info_text} ${styles.info_text_accent}`}>iGT-PA is a digital wellbeing assistant designed to provide general emotional support and self-help tools. It does not provide medical diagnosis, treatment, or professional mental health advice.</p>
+				<p className={`${styles.info_text} ${styles.info_text_accent}`}>I Got This! is a digital wellbeing assistant designed to provide general emotional support and self-help tools. It does not provide medical diagnosis, treatment, or professional mental health advice.</p>
 				<p className={styles.info_text}>If you are experiencing a mental health crisis or feel unsafe, please contact a qualified mental health professional or an emergency helpline immediately.</p>
-				<p className={styles.info_text}>iGT-PA is powered by artificial intelligence. Conversations may be reviewed by trained human moderators for safety and quality purposes. Your data is handled according to our Privacy Policy and is never used to make automated clinical decisions about you.</p>
+				<p className={styles.info_text}>I Got This! is powered by artificial intelligence. Conversations may be reviewed by trained human moderators for safety and quality purposes. Your data is handled according to our Privacy Policy and is never used to make automated clinical decisions about you.</p>
 				<p className={`${styles.info_text} ${styles.info_text_accent}`}>If you need urgent help in the UK, call Samaritans on 116 123 (freephone, 24/7). For other countries, visit: <a href='https://www.iasp.info/resources/Crisis_Centres/' target='_blank' rel='noopener noreferrer'>www.iasp.info/resources/Crisis_Centres/</a></p>
 			</div>,
 			button: 'I Understand'

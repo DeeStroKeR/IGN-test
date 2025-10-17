@@ -145,7 +145,7 @@ function Layout() {
 			<Header style={{ display: 'flex', alignItems: 'center', height: '56px', padding: '0 16px', position: 'sticky', top: 0, zIndex: 1, width: '100%' }}>
 				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', margin: '0 auto' }}>
 					<MenuOutlined onClick={() => setCollapsed(false)} style={{ color: 'white' }} />
-					<h1 className={styles.header_header}>iGT-PA!</h1>
+					<h1 className={styles.header_header}>I Got This!</h1>
 					<Button variant="outlined" size="small" style={{ background: 'transparent', color: 'white' }} shape='circle' icon={<InfoOutlined />} onClick={() => setIsModalOpen(true)} />
 				</div>
 			</Header>
@@ -171,9 +171,9 @@ function Layout() {
 			centered
 			footer={[]}
 		>
-			<p className={`${styles.modal_text} ${styles.modal_text_accent}`}>iGT-PA is a digital wellbeing assistant designed to provide general emotional support and self-help tools. It does not provide medical diagnosis, treatment, or professional mental health advice.</p>
+			<p className={`${styles.modal_text} ${styles.modal_text_accent}`}>I Got This! is a digital wellbeing assistant designed to provide general emotional support and self-help tools. It does not provide medical diagnosis, treatment, or professional mental health advice.</p>
 			<p className={styles.modal_text}>If you are experiencing a mental health crisis or feel unsafe, please contact a qualified mental health professional or an emergency helpline immediately.</p>
-			<p className={styles.modal_text}>iGT-PA is powered by artificial intelligence. Conversations may be reviewed by trained human moderators for safety and quality purposes. Your data is handled according to our Privacy Policy and is never used to make automated clinical decisions about you.</p>
+			<p className={styles.modal_text}>I Got This! is powered by artificial intelligence. Conversations may be reviewed by trained human moderators for safety and quality purposes. Your data is handled according to our Privacy Policy and is never used to make automated clinical decisions about you.</p>
 			<p className={`${styles.modal_text} ${styles.modal_text_accent}`}>If you need urgent help in the UK, call Samaritans on 116 123 (freephone, 24/7). For other countries, visit: <a href='https://www.iasp.info/resources/Crisis_Centres/' target='_blank' rel='noopener noreferrer'>www.iasp.info/resources/Crisis_Centres/</a></p>
 		</Modal>
 		</AntLayout>
