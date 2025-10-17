@@ -76,7 +76,8 @@ function Layout() {
 			owner: cognitoUser.userId,
 			aboutMe: '',
 			jobTitle: '',
-			jobDescription: ''
+			jobDescription: '',
+			diagnosis: ''
 		});
 
 		if (errors) {
@@ -91,7 +92,8 @@ function Layout() {
 				owner: cognitoUser.userId,
 				aboutMe: '',
 				jobTitle: '',
-				jobDescription: ''
+				jobDescription: '',
+				diagnosis: ''
 			});
 			setShowStepper(false);
 		}

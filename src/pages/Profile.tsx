@@ -24,6 +24,7 @@ function Profile() {
 				aboutMe: userInfo.aboutMe,
 				jobTitle: userInfo.jobTitle,
 				jobDescription: userInfo.jobDescription,
+				diagnosis: userInfo.diagnosis,
 			});
 		}
 	}, [userInfo]);
@@ -38,6 +39,7 @@ function Profile() {
 			jobDescription: values.jobDescription,
 			aboutMe: values.aboutMe,
 			birthday: dayjs(values.birthday).format('YYYY-MM-DD'),
+			diagnosis: values.diagnosis,
 			owner: cognitoUser.userId,
 		}
 
@@ -55,6 +57,7 @@ function Profile() {
 					aboutMe: updatedUserInfo.aboutMe,
 					jobTitle: updatedUserInfo.jobTitle,
 					jobDescription: updatedUserInfo.jobDescription,
+					diagnosis: updatedUserInfo.diagnosis,
 				});
 				setUser(updatedUserInfo);
 			}
@@ -78,6 +81,7 @@ function Profile() {
 					aboutMe: updatedUserInfo.aboutMe,
 					jobTitle: updatedUserInfo.jobTitle,
 					jobDescription: updatedUserInfo.jobDescription,
+					diagnosis: updatedUserInfo.diagnosis,
 				});
 				setUser(updatedUserInfo);
 			}
@@ -179,6 +183,14 @@ function Profile() {
 					<Form.Item<ProfileForm>
 						label="How would you describe your job?"
 						name="jobDescription"
+						colon={false}
+					>
+						<TextArea rows={4} />
+					</Form.Item>
+		
+					<Form.Item<ProfileForm>
+						label="Do you have any formal diagnosis or recognised disability you would like us to know about? Knowing this will help us to understand your needs better."
+						name="diagnosis"
 						colon={false}
 					>
 						<TextArea rows={4} />

@@ -5,6 +5,7 @@ export interface ProfileForm {
 	aboutMe: string
 	jobTitle: string
 	jobDescription: string
+	diagnosis: string
 	owner: string
 	id?: string
 }

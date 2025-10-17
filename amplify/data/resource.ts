@@ -15,6 +15,7 @@ const schema = a.schema({
       jobDescription: a.string().required(),
       aboutMe: a.string().required(),
       birthday: a.date().required(),
+      diagnosis: a.string().required().default(''),
       owner: a.string().required()
     })
     .authorization((allow) => [allow.owner()]),
