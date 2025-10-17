@@ -32,6 +32,8 @@ function Layout() {
 	const [collapsed, setCollapsed] = useState(true);
 	const [showStepper, setShowStepper] = useState(false);
 	const [conversations, setConversations] = useState<any[]>([]);
+	const [selectedConversation, setSelectedConversation] = useState<any>(null);
+	const [isConversationModalOpen, setIsConversationModalOpen] = useState(false);
 	const {
 		token: { colorBgContainer, borderRadiusLG },
 	} = theme.useToken();
@@ -127,6 +129,12 @@ function Layout() {
 		setLoading(false);
 	}
 
+	const handleConversationClick = (conversation: any) => {
+		setSelectedConversation(conversation);
+		setIsConversationModalOpen(true);
+		setCollapsed(true); // Close sidebar when opening conversation
+	}
+
 	if (!user && !showStepper) {
 		return <DualRingLoader text="Loading user information..." size={80}/>;
 	}
@@ -161,7 +169,12 @@ function Layout() {
 							</div>
 						) : (
 							conversations.slice(0, 5).map((conversation) => (
-								<div key={conversation.id} className={styles.conversation_item}>
+								<div 
+									key={conversation.id} 
+									className={styles.conversation_item}
+									onClick={() => handleConversationClick(conversation)}
+									style={{ cursor: 'pointer' }}
+								>
 									<div className={styles.conversation_title}>{conversation.title}</div>
 									<div className={styles.conversation_meta}>
 										{conversation.messageCount} messages • {new Date(conversation.createdAt).toLocaleDateString()}
@@ -225,6 +238,62 @@ function Layout() {
 			<p className={styles.modal_text}>If you are experiencing a mental health crisis or feel unsafe, please contact a qualified mental health professional or an emergency helpline immediately.</p>
 			<p className={styles.modal_text}>I Got This! is powered by artificial intelligence. Conversations may be reviewed by trained human moderators for safety and quality purposes. Your data is handled according to our Privacy Policy and is never used to make automated clinical decisions about you.</p>
 			<p className={`${styles.modal_text} ${styles.modal_text_accent}`}>If you need urgent help in the UK, call Samaritans on 116 123 (freephone, 24/7). For other countries, visit: <a href='https://www.iasp.info/resources/Crisis_Centres/' target='_blank' rel='noopener noreferrer'>www.iasp.info/resources/Crisis_Centres/</a></p>
+		</Modal>
+		
+		<Modal
+			title={selectedConversation ? `Conversation: ${selectedConversation.title}` : 'Conversation'}
+			open={isConversationModalOpen}
+			onCancel={() => setIsConversationModalOpen(false)}
+			centered
+			width={800}
+			footer={[]}
+		>
+			{selectedConversation && (
+				<div style={{ maxHeight: '60vh', overflowY: 'auto', padding: '10px 0' }}>
+					<div style={{ marginBottom: '16px', color: '#666', fontSize: '14px' }}>
+						{selectedConversation.messageCount} messages • {new Date(selectedConversation.createdAt).toLocaleString()}
+					</div>
+					{selectedConversation.transcript.map((entry: any, index: number) => (
+						<div key={index} style={{ marginBottom: '16px' }}>
+							{entry.source === 'user' ? (
+								<div style={{ 
+									backgroundColor: '#f0f0f0', 
+									padding: '12px', 
+									borderRadius: '8px',
+									marginLeft: '20px'
+								}}>
+									<div style={{ 
+										fontWeight: 'bold', 
+										color: '#ff8160', 
+										marginBottom: '4px',
+										fontSize: '14px'
+									}}>
+										{user?.name || 'You'}
+									</div>
+									<div>{entry.text}</div>
+								</div>
+							) : (
+								<div style={{ 
+									backgroundColor: '#e6f7ff', 
+									padding: '12px', 
+									borderRadius: '8px',
+									marginRight: '20px'
+								}}>
+									<div style={{ 
+										fontWeight: 'bold', 
+										color: '#1890ff', 
+										marginBottom: '4px',
+										fontSize: '14px'
+									}}>
+										Finn
+									</div>
+									<div>{entry.text}</div>
+								</div>
+							)}
+						</div>
+					))}
+				</div>
+			)}
 		</Modal>
 		</AntLayout>
 	)
