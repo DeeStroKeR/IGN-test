@@ -106,3 +106,48 @@
     border-top: 1px solid rgb(229, 231, 235);
   }
 }
+
+.chat_history_section {
+  margin: 16px 4px;
+  border-top: 1px solid rgb(229, 231, 235);
+  padding-top: 16px;
+}
+
+.section_header {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2a2e30;
+  margin-bottom: 8px;
+  padding: 0 16px;
+}
+
+.conversation_list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.conversation_item {
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  margin: 2px 4px;
+  
+  &:hover {
+    background: #0000000f;
+  }
+}
+
+.conversation_title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2a2e30;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation_meta {
+  font-size: 11px;
+  color: #666;
+}

@@ -19,6 +19,15 @@ const schema = a.schema({
       owner: a.string().required()
     })
     .authorization((allow) => [allow.owner()]),
+    
+  Conversation: a
+    .model({
+      title: a.string().required(),
+      transcript: a.json().required(),
+      messageCount: a.integer().required(),
+      owner: a.string().required()
+    })
+    .authorization((allow) => [allow.owner()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

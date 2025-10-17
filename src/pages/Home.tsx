@@ -6,6 +6,7 @@ import { Button, Card } from 'antd';
 import { SceneResponse } from '@soulmachines/smwebsdk/lib-esm/websocket-message/scene/SceneResponse';
 import styles from './home.module.scss';
 import { useUser } from '../contexts/UserContext';
+import { client } from '../http/client';
 
 // const apiKey =
 //   'eyJzb3VsSWQiOiJkZG5hLWlndHBhbHRkLS10ZXN0cHJvamVjdCIsImF1dGhTZXJ2ZXIiOiJodHRwczovL2RoLnNvdWxtYWNoaW5lcy5jbG91ZC9hcGkvand0IiwiYXV0aFRva2VuIjoiYXBpa2V5X3YxXzg5ODUxNjQ3LWE5MmYtNGZhNC1iZDllLTBiMWZhZDg3YWFkZCJ9';
@@ -287,7 +288,28 @@ function Home() {
     }
   };
 
-  const reset = () => {
+  const reset = async () => {
+    // Save conversation if there are messages
+    if (transcript.length > 0) {
+      try {
+        // Generate a title from the first user message or use timestamp
+        let title = `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+        const firstUserMessage = transcript.find(entry => entry.source === 'user');
+        if (firstUserMessage) {
+          title = firstUserMessage.text.slice(0, 50) + (firstUserMessage.text.length > 50 ? '...' : '');
+        }
+
+        await client.models.Conversation.create({
+          title,
+          transcript: transcript,
+          messageCount: transcript.length,
+          owner: cognitoUser.userId
+        });
+      } catch (error) {
+        console.error('Error saving conversation:', error);
+      }
+    }
+
     if (sceneRef.current) {
       setShowPersona(false);
       setTranscript([]);

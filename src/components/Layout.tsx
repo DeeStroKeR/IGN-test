@@ -31,6 +31,7 @@ function Layout() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [collapsed, setCollapsed] = useState(true);
 	const [showStepper, setShowStepper] = useState(false);
+	const [conversations, setConversations] = useState<any[]>([]);
 	const {
 		token: { colorBgContainer, borderRadiusLG },
 	} = theme.useToken();
@@ -43,6 +44,23 @@ function Layout() {
 			getUserInfo(cognitoUser.userId)
 		}
 	}, [user]);
+
+	useEffect(() => {
+		if (user) {
+			loadConversations();
+		}
+	}, [user]);
+
+	const loadConversations = async () => {
+		try {
+			const { data } = await client.models.Conversation.list({
+				filter: { owner: { eq: cognitoUser.userId } }
+			});
+			setConversations(data?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) || []);
+		} catch (error) {
+			console.error('Error loading conversations:', error);
+		}
+	};
 
 	const getUserInfo = async (userId: string) => {
 		const { data, errors } = await client.models.User.get({ id: userId });
@@ -124,6 +142,27 @@ function Layout() {
 					disabled={isLoading}
 					onClick={() => setCollapsed(true)}
 				/>
+				
+				<div className={styles.chat_history_section}>
+					<div className={styles.section_header}>Chat History</div>
+					<div className={styles.conversation_list}>
+						{conversations.length === 0 ? (
+							<div className={styles.conversation_item}>
+								No conversations yet
+							</div>
+						) : (
+							conversations.slice(0, 5).map((conversation) => (
+								<div key={conversation.id} className={styles.conversation_item}>
+									<div className={styles.conversation_title}>{conversation.title}</div>
+									<div className={styles.conversation_meta}>
+										{conversation.messageCount} messages • {new Date(conversation.createdAt).toLocaleDateString()}
+									</div>
+								</div>
+							))
+						)}
+					</div>
+				</div>
+				
 				<a href="mailto:info@igt-pa.co.uk" className={styles.help_link}><QuestionOutlined className={styles.help_icon}/> Request help</a>
 				<div className={styles.logout_wrapper}>
 					<ConfigProvider
