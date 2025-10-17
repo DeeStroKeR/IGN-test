@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { Card, Modal, Button } from 'antd';
+import { Card, Modal } from 'antd';
 import { ArrowRightOutlined, MessageOutlined } from '@ant-design/icons';
 import { client } from '../../http/client';
 import { useUser } from '../../contexts/UserContext';
