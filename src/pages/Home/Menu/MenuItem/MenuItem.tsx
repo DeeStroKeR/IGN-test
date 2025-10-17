@@ -63,6 +63,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ name, description, link }) => {
             fontWeight={700}
             gutterBottom
             className={classes.title}
+            style={{ color: '#ff8160' }}
           >
             {name}
           </Typography>

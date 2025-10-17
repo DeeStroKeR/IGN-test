@@ -140,7 +140,7 @@ function RegisterSteps({ onComplete }: RegisterStepsProps) {
 
 	return (
 		<div className={styles.wrapper}>
-			<div className={styles.container}>
+			<div className={styles.container} style={{ border: '2px solid #ff8160' }}>
 				<div className={styles.steps_indicator_wrapper}>
 					{steps.map((_, index) => (
 						<div 

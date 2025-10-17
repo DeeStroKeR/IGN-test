@@ -324,7 +324,7 @@ function Home() {
 
         <div className={styles.space}></div>
         <div className={styles.buttons}>
-          {status !== 'Connected' && <Button type="primary" disabled={isPersonLoading || status === 'Connected'} onClick={connect}>Talk</Button>}
+          {status !== 'Connected' && <Button type="primary" disabled={isPersonLoading || status === 'Connected'} onClick={connect} style={{ backgroundColor: '#ff8160', borderColor: '#ff8160' }}>Talk</Button>}
           {status === 'Connected' && <Button type="primary" onClick={reset} style={{ marginLeft: 10 }}>
             End conversation
           </Button>}

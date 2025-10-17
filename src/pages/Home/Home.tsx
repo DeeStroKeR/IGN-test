@@ -5,7 +5,7 @@ import styles from './home.module.scss';
 function BreatheHomepage() {
   return (
     <div className={styles.wrapper}>
-      <Typography variant="h2" fontWeight="700" className={styles.title}>
+      <Typography variant="h2" fontWeight="700" className={styles.title} style={{ color: '#ff8160' }}>
         Guided Breathing Timer
       </Typography>
       <Typography variant="h6" color="#8D9099" className={styles.description}>

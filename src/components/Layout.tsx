@@ -142,7 +142,7 @@ function Layout() {
 				</div>
 			</Drawer>
 		<AntLayout>	
-			<Header style={{ display: 'flex', alignItems: 'center', height: '56px', padding: '0 16px', position: 'sticky', top: 0, zIndex: 1, width: '100%' }}>
+			<Header style={{ display: 'flex', alignItems: 'center', height: '56px', padding: '0 16px', position: 'sticky', top: 0, zIndex: 1, width: '100%', borderBottom: '2px solid #ff8160' }}>
 				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', margin: '0 auto' }}>
 					<MenuOutlined onClick={() => setCollapsed(false)} style={{ color: 'white' }} />
 					<h1 className={styles.header_header}>I Got This!</h1>
@@ -160,7 +160,7 @@ function Layout() {
 					<Outlet context={123}/>
 				</div>
 			</Content>
-			<Footer className={styles.footer}>
+			<Footer className={styles.footer} style={{ color: '#ff8160' }}>
 				iGT-PA Ltd ©{new Date().getFullYear()}
 			</Footer>
 		</AntLayout>

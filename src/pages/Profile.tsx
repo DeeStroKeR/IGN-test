@@ -185,7 +185,7 @@ function Profile() {
 					</Form.Item>
 		
 					<Form.Item label={null}>
-						<Button type="primary" size="middle" htmlType="submit" loading={isFormLoading} disabled={isFormLoading}>
+						<Button type="primary" size="middle" htmlType="submit" loading={isFormLoading} disabled={isFormLoading} style={{ backgroundColor: '#ff8160', borderColor: '#ff8160' }}>
 							Save
 						</Button>
 					</Form.Item>
