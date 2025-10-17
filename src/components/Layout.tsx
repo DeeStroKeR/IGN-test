@@ -58,8 +58,13 @@ function Layout() {
 				filter: { owner: { eq: cognitoUser.userId } }
 			});
 			console.log('💬 SIDEBAR: Raw conversation data from DB:', data);
-			const sortedConversations = data?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) || [];
-			console.log('💬 SIDEBAR: Sorted conversations:', sortedConversations);
+			const processedConversations = data?.map(conv => ({
+				...conv,
+				// Parse the JSON transcript back to array for future use
+				transcript: typeof conv.transcript === 'string' ? JSON.parse(conv.transcript) : conv.transcript
+			})) || [];
+			const sortedConversations = processedConversations.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+			console.log('💬 SIDEBAR: Processed and sorted conversations:', sortedConversations);
 			setConversations(sortedConversations);
 		} catch (error) {
 			console.error('💬 SIDEBAR: Error loading conversations:', error);

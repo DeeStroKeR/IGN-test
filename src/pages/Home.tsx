@@ -325,7 +325,7 @@ function Home() {
 
         const result = await client.models.Conversation.create({
           title,
-          transcript: transcript,
+          transcript: JSON.stringify(transcript),
           messageCount: transcript.length,
           owner: cognitoUser.userId
         });
