@@ -73,7 +73,7 @@ function Home() {
           }
           console.log('🤖 Adding Finn message to transcript:', personaSpeech);
           setTranscript(prev => {
-            const newTranscript = [...prev, { source: 'persona', text: personaSpeech }];
+            const newTranscript = [...prev, { source: 'persona' as const, text: personaSpeech }];
             console.log('🤖 Updated transcript after Finn message:', newTranscript);
             return newTranscript;
           });
@@ -103,7 +103,7 @@ function Home() {
         }
         console.log('👤 Adding user message to transcript:', userSpeech);
         setTranscript(prev => {
-          const newTranscript = [...prev, { source: 'user', text: userSpeech }];
+          const newTranscript = [...prev, { source: 'user' as const, text: userSpeech }];
           console.log('👤 Updated transcript after user message:', newTranscript);
           return newTranscript;
         });
