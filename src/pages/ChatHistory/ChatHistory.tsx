@@ -109,9 +109,8 @@ function ChatHistory() {
                 <ArrowRightOutlined className={styles.arrow} />
               </div>
               <div className={styles.conversationInfo}>
-                <div className={styles.conversationTitle}>{conversation.title}</div>
                 <div className={styles.messageCount}>
-                  💬 {conversation.messageCount} message{conversation.messageCount !== 1 ? 's' : ''}
+                  {conversation.messageCount} message{conversation.messageCount !== 1 ? 's' : ''} →
                 </div>
               </div>
             </Card>

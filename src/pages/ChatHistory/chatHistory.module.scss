@@ -57,21 +57,20 @@
   .conversationsList {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 0;
   }
 
   .conversationCard {
-    border: 1px solid #e8e8e8;
-    border-radius: 12px;
+    border: none;
+    border-radius: 0;
     cursor: pointer;
     transition: all 0.2s ease;
-    padding: 16px;
-    background: white;
+    padding: 16px 0;
+    background: transparent;
+    border-bottom: 1px solid #f0f0f0;
 
     &:hover {
-      border-color: #ff8160;
-      box-shadow: 0 2px 12px rgba(255, 129, 96, 0.1);
-      transform: translateY(-2px);
+      background: rgba(255, 129, 96, 0.05);
       
       .arrow {
         transform: translateX(4px);
@@ -83,25 +82,38 @@
       }
     }
 
+    &:last-child {
+      border-bottom: none;
+    }
+
     .conversationHeader {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 8px;
+      align-items: center;
+      margin-bottom: 4px;
 
       .conversationDate {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        &:before {
+          content: "💬";
+          font-size: 16px;
+          opacity: 0.7;
+        }
+
         .date {
-          font-size: 15px;
+          font-size: 16px;
           font-weight: 600;
-          color: #2f3b69;
-          margin-bottom: 2px;
+          color: #333;
           transition: color 0.2s ease;
         }
 
         .time {
-          font-size: 13px;
-          color: #888;
-          font-weight: 500;
+          font-size: 14px;
+          color: #999;
+          font-weight: normal;
         }
       }
 
@@ -109,26 +121,24 @@
         font-size: 16px;
         color: #ccc;
         transition: all 0.2s ease;
-        margin-top: 1px;
       }
     }
 
     .conversationInfo {
+      padding-left: 28px;
+
       .conversationTitle {
-        font-size: 16px;
-        font-weight: 500;
-        color: #333;
-        margin-bottom: 6px;
+        font-size: 14px;
+        font-weight: normal;
+        color: #666;
+        margin-bottom: 2px;
         line-height: 1.3;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
       }
 
       .messageCount {
         font-size: 12px;
         color: #999;
-        font-weight: 500;
+        font-weight: normal;
       }
     }
   }
