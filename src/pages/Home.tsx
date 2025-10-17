@@ -71,7 +71,12 @@ function Home() {
             console.log('Setting microphone active');
             scene.setMediaDeviceActive({ microphone: true, camera: true });
           }
-          setTranscript(prev => [...prev, { source: 'persona', text: personaSpeech }]);
+          console.log('🤖 Adding Finn message to transcript:', personaSpeech);
+          setTranscript(prev => {
+            const newTranscript = [...prev, { source: 'persona', text: personaSpeech }];
+            console.log('🤖 Updated transcript after Finn message:', newTranscript);
+            return newTranscript;
+          });
         }
       }
     };
@@ -81,7 +86,7 @@ function Home() {
       const result = results[0];
       if (result.final === true) {
         const userSpeech = result.alternatives[0].transcript;
-        console.log('Sending user speech to persona:', userSpeech, personaInstanceRef.current);
+        console.log('👤 Sending user speech to persona:', userSpeech, personaInstanceRef.current);
         if (personaInstanceRef.current) {
           personaInstanceRef.current.conversationSend(userSpeech, {
             userInfo: {
@@ -96,7 +101,12 @@ function Home() {
           },
             { kind: 'userTalk' });
         }
-        setTranscript(prev => [...prev, { source: 'user', text: userSpeech }]);
+        console.log('👤 Adding user message to transcript:', userSpeech);
+        setTranscript(prev => {
+          const newTranscript = [...prev, { source: 'user', text: userSpeech }];
+          console.log('👤 Updated transcript after user message:', newTranscript);
+          return newTranscript;
+        });
       }
     };
 
@@ -176,6 +186,8 @@ function Home() {
 }, [sceneRef.current]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const connect = async () => {
+    console.log('🚀 CONNECT: Starting connection process');
+    console.log('🚀 CONNECT: Current transcript length:', transcript.length);
     setShowPersona(true);
     setIsPersonLoading(true);
     if (!videoRef.current) {
@@ -228,8 +240,8 @@ function Home() {
 
       setStatus('Connected');
       const videoState = await sceneRef.current.startVideo();
-      console.info('started video with state:', videoState);
-
+      console.info('🚀 CONNECT: Started video with state:', videoState);
+      console.log('🚀 CONNECT: Connection successful, ready for conversation');
       
       setIsPersonLoading(false);
     } catch (error: unknown) {
@@ -289,6 +301,10 @@ function Home() {
   };
 
   const reset = async () => {
+    console.log('🛑 RESET: End Conversation button clicked!');
+    console.log('🛑 RESET: Current transcript length:', transcript.length);
+    console.log('🛑 RESET: Full transcript contents:', transcript);
+    
     // Save conversation if there are messages
     if (transcript.length > 0) {
       try {
@@ -299,24 +315,45 @@ function Home() {
           title = firstUserMessage.text.slice(0, 50) + (firstUserMessage.text.length > 50 ? '...' : '');
         }
 
-        await client.models.Conversation.create({
+        console.log('💾 SAVE: Attempting to save conversation with title:', title);
+        console.log('💾 SAVE: Data being saved:', {
           title,
           transcript: transcript,
           messageCount: transcript.length,
           owner: cognitoUser.userId
         });
+
+        const result = await client.models.Conversation.create({
+          title,
+          transcript: transcript,
+          messageCount: transcript.length,
+          owner: cognitoUser.userId
+        });
+        
+        console.log('✅ SAVE: Conversation saved successfully!', result);
+        
+        // Trigger a page reload to refresh conversation list (temporary solution)
+        setTimeout(() => {
+          console.log('🔄 RELOAD: Refreshing page to update sidebar...');
+          window.location.reload();
+        }, 1000);
       } catch (error) {
-        console.error('Error saving conversation:', error);
+        console.error('❌ SAVE: Error saving conversation:', error);
+        console.error('❌ SAVE: Error details:', JSON.stringify(error, null, 2));
       }
+    } else {
+      console.log('⚠️ SAVE: No transcript to save - conversation was empty');
     }
 
     if (sceneRef.current) {
+      console.log('🧹 CLEANUP: Disconnecting scene and clearing transcript...');
       setShowPersona(false);
       setTranscript([]);
       sceneRef.current.disconnect();
       sceneRef.current = null;
     }
     setStatus('Disconnected');
+    console.log('🛑 RESET: Complete! Status set to Disconnected');
   };
 
 //   const sendMessage = () => {
@@ -327,6 +364,10 @@ function Home() {
 //   setTranscript(prev => [...prev, { source: 'user', text: inputText }]);
 //   setInputText('');
 // };
+
+  // Debug log current state
+  console.log('🔄 RENDER: Current transcript state:', transcript);
+  console.log('🔄 RENDER: Status:', status, 'Show persona:', showPersona);
 
 	return (
 		<>

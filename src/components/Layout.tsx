@@ -53,12 +53,16 @@ function Layout() {
 
 	const loadConversations = async () => {
 		try {
+			console.log('💬 SIDEBAR: Loading conversations for user:', cognitoUser.userId);
 			const { data } = await client.models.Conversation.list({
 				filter: { owner: { eq: cognitoUser.userId } }
 			});
-			setConversations(data?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) || []);
+			console.log('💬 SIDEBAR: Raw conversation data from DB:', data);
+			const sortedConversations = data?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) || [];
+			console.log('💬 SIDEBAR: Sorted conversations:', sortedConversations);
+			setConversations(sortedConversations);
 		} catch (error) {
-			console.error('Error loading conversations:', error);
+			console.error('💬 SIDEBAR: Error loading conversations:', error);
 		}
 	};
 
