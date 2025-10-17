@@ -11,6 +11,7 @@ import NotFound from './pages/NotFound.tsx';
 import Layout from './components/Layout.tsx';
 import Home from './pages/Home.tsx';
 import Profile from './pages/Profile.tsx';
+import ChatHistory from './pages/ChatHistory/ChatHistory.tsx';
 import BreatheHomepage from './pages/Home/Home.tsx';
 import FourSevenEight from './pages/FourSevenEight/FourSevenEight.tsx';
 import ResonanceBreathing from './pages/ResonanceBreathing/ResonanceBreathing.tsx';
@@ -38,6 +39,7 @@ const router = createBrowserRouter(
                 <Route path="/" element={<Layout/>}>
                     <Route index element={<Home />}/>
                     <Route path="profile" element={<Profile/>}/>
+                    <Route path="chat-history" element={<ChatHistory/>}/>
                     <Route element={<ThemedRoutes />}>
                         <Route path="breathe">
                             <Route index element={<BreatheHomepage/>}/>

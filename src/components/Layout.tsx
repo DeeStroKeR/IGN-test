@@ -4,7 +4,7 @@ import { Outlet } from 'react-router';
 import { Link, useLocation } from 'react-router-dom';
 import { signOut } from 'aws-amplify/auth';
 import { useEffect, useState } from 'react';
-import { CloseOutlined, MenuOutlined, HomeOutlined, UserOutlined, HeartOutlined, InfoOutlined, QuestionOutlined } from '@ant-design/icons';
+import { CloseOutlined, MenuOutlined, HomeOutlined, UserOutlined, HeartOutlined, InfoOutlined, QuestionOutlined, HistoryOutlined } from '@ant-design/icons';
 import styles from './layout.module.scss';
 import { useUser } from '../contexts/UserContext';
 import { client } from '../http/client';
@@ -17,6 +17,7 @@ const { Header, Content, Footer } = AntLayout;
 const pages: MenuProps['items'] = [
   { key: '/', label: <Link to="/">Home</Link>, icon: <HomeOutlined /> },
   { key: '/profile', label: <Link to="/profile">Profile</Link>, icon: <UserOutlined /> },
+  { key: '/chat-history', label: <Link to="/chat-history">Chat History</Link>, icon: <HistoryOutlined /> },
   { type: 'divider' },
   { key: 'exercises', label: 'Well-being Tools', type: 'group' },
   { key: '/breathe', label: <Link to="/breathe">Take a Breather</Link>, icon: <HeartOutlined /> },
@@ -31,9 +32,6 @@ function Layout() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [collapsed, setCollapsed] = useState(true);
 	const [showStepper, setShowStepper] = useState(false);
-	const [conversations, setConversations] = useState<any[]>([]);
-	const [selectedConversation, setSelectedConversation] = useState<any>(null);
-	const [isConversationModalOpen, setIsConversationModalOpen] = useState(false);
 	const {
 		token: { colorBgContainer, borderRadiusLG },
 	} = theme.useToken();
@@ -46,32 +44,6 @@ function Layout() {
 			getUserInfo(cognitoUser.userId)
 		}
 	}, [user]);
-
-	useEffect(() => {
-		if (user) {
-			loadConversations();
-		}
-	}, [user]);
-
-	const loadConversations = async () => {
-		try {
-			console.log('💬 SIDEBAR: Loading conversations for user:', cognitoUser.userId);
-			const { data } = await client.models.Conversation.list({
-				filter: { owner: { eq: cognitoUser.userId } }
-			});
-			console.log('💬 SIDEBAR: Raw conversation data from DB:', data);
-			const processedConversations = data?.map(conv => ({
-				...conv,
-				// Parse the JSON transcript back to array for future use
-				transcript: typeof conv.transcript === 'string' ? JSON.parse(conv.transcript) : conv.transcript
-			})) || [];
-			const sortedConversations = processedConversations.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-			console.log('💬 SIDEBAR: Processed and sorted conversations:', sortedConversations);
-			setConversations(sortedConversations);
-		} catch (error) {
-			console.error('💬 SIDEBAR: Error loading conversations:', error);
-		}
-	};
 
 	const getUserInfo = async (userId: string) => {
 		const { data, errors } = await client.models.User.get({ id: userId });
@@ -129,12 +101,6 @@ function Layout() {
 		setLoading(false);
 	}
 
-	const handleConversationClick = (conversation: any) => {
-		setSelectedConversation(conversation);
-		setIsConversationModalOpen(true);
-		setCollapsed(true); // Close sidebar when opening conversation
-	}
-
 	if (!user && !showStepper) {
 		return <DualRingLoader text="Loading user information..." size={80}/>;
 	}
@@ -159,31 +125,6 @@ function Layout() {
 					disabled={isLoading}
 					onClick={() => setCollapsed(true)}
 				/>
-				
-				<div className={styles.chat_history_section}>
-					<div className={styles.section_header}>Chat History</div>
-					<div className={styles.conversation_list}>
-						{conversations.length === 0 ? (
-							<div className={styles.conversation_item}>
-								No conversations yet
-							</div>
-						) : (
-							conversations.slice(0, 5).map((conversation) => (
-								<div 
-									key={conversation.id} 
-									className={styles.conversation_item}
-									onClick={() => handleConversationClick(conversation)}
-									style={{ cursor: 'pointer' }}
-								>
-									<div className={styles.conversation_title}>{conversation.title}</div>
-									<div className={styles.conversation_meta}>
-										{conversation.messageCount} messages • {new Date(conversation.createdAt).toLocaleDateString()}
-									</div>
-								</div>
-							))
-						)}
-					</div>
-				</div>
 				
 				<a href="mailto:info@igt-pa.co.uk" className={styles.help_link}><QuestionOutlined className={styles.help_icon}/> Request help</a>
 				<div className={styles.logout_wrapper}>
@@ -238,62 +179,6 @@ function Layout() {
 			<p className={styles.modal_text}>If you are experiencing a mental health crisis or feel unsafe, please contact a qualified mental health professional or an emergency helpline immediately.</p>
 			<p className={styles.modal_text}>I Got This! is powered by artificial intelligence. Conversations may be reviewed by trained human moderators for safety and quality purposes. Your data is handled according to our Privacy Policy and is never used to make automated clinical decisions about you.</p>
 			<p className={`${styles.modal_text} ${styles.modal_text_accent}`}>If you need urgent help in the UK, call Samaritans on 116 123 (freephone, 24/7). For other countries, visit: <a href='https://www.iasp.info/resources/Crisis_Centres/' target='_blank' rel='noopener noreferrer'>www.iasp.info/resources/Crisis_Centres/</a></p>
-		</Modal>
-		
-		<Modal
-			title={selectedConversation ? `Conversation: ${selectedConversation.title}` : 'Conversation'}
-			open={isConversationModalOpen}
-			onCancel={() => setIsConversationModalOpen(false)}
-			centered
-			width={800}
-			footer={[]}
-		>
-			{selectedConversation && (
-				<div style={{ maxHeight: '60vh', overflowY: 'auto', padding: '10px 0' }}>
-					<div style={{ marginBottom: '16px', color: '#666', fontSize: '14px' }}>
-						{selectedConversation.messageCount} messages • {new Date(selectedConversation.createdAt).toLocaleString()}
-					</div>
-					{selectedConversation.transcript.map((entry: any, index: number) => (
-						<div key={index} style={{ marginBottom: '16px' }}>
-							{entry.source === 'user' ? (
-								<div style={{ 
-									backgroundColor: '#f0f0f0', 
-									padding: '12px', 
-									borderRadius: '8px',
-									marginLeft: '20px'
-								}}>
-									<div style={{ 
-										fontWeight: 'bold', 
-										color: '#ff8160', 
-										marginBottom: '4px',
-										fontSize: '14px'
-									}}>
-										{user?.name || 'You'}
-									</div>
-									<div>{entry.text}</div>
-								</div>
-							) : (
-								<div style={{ 
-									backgroundColor: '#e6f7ff', 
-									padding: '12px', 
-									borderRadius: '8px',
-									marginRight: '20px'
-								}}>
-									<div style={{ 
-										fontWeight: 'bold', 
-										color: '#1890ff', 
-										marginBottom: '4px',
-										fontSize: '14px'
-									}}>
-										Finn
-									</div>
-									<div>{entry.text}</div>
-								</div>
-							)}
-						</div>
-					))}
-				</div>
-			)}
 		</Modal>
 		</AntLayout>
 	)

@@ -1,0 +1,172 @@
+.chatHistory {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+
+  .header {
+    margin-bottom: 32px;
+    text-align: center;
+
+    .title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #2f3b69;
+      margin: 0 0 8px 0;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 16px;
+  }
+
+  .emptyState {
+    text-align: center;
+    padding: 60px 40px;
+    border: 2px dashed #d9d9d9;
+    background-color: #fafafa;
+
+    .emptyIcon {
+      font-size: 48px;
+      color: #d9d9d9;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      color: #666;
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    p {
+      color: #999;
+      margin: 0;
+      font-size: 14px;
+    }
+  }
+
+  .conversationsList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .conversationCard {
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #ff8160;
+      box-shadow: 0 2px 8px rgba(255, 129, 96, 0.15);
+      
+      .arrow {
+        transform: translateX(4px);
+        color: #ff8160;
+      }
+    }
+
+    .conversationHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+
+      .conversationDate {
+        .date {
+          font-size: 16px;
+          font-weight: 600;
+          color: #2f3b69;
+          margin-bottom: 2px;
+        }
+
+        .time {
+          font-size: 14px;
+          color: #666;
+        }
+      }
+
+      .arrow {
+        font-size: 16px;
+        color: #bbb;
+        transition: all 0.2s ease;
+        margin-top: 2px;
+      }
+    }
+
+    .conversationInfo {
+      .conversationTitle {
+        font-size: 15px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 4px;
+        line-height: 1.4;
+      }
+
+      .messageCount {
+        font-size: 13px;
+        color: #888;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        &:before {
+          content: "💬";
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .chatHistory {
+    padding: 16px;
+    
+    .header {
+      margin-bottom: 24px;
+      
+      .title {
+        font-size: 24px;
+      }
+      
+      .subtitle {
+        font-size: 14px;
+      }
+    }
+    
+    .conversationCard {
+      .conversationHeader {
+        .conversationDate {
+          .date {
+            font-size: 15px;
+          }
+          
+          .time {
+            font-size: 13px;
+          }
+        }
+      }
+      
+      .conversationInfo {
+        .conversationTitle {
+          font-size: 14px;
+        }
+        
+        .messageCount {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
