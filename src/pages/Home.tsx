@@ -39,6 +39,7 @@ function Home() {
   const sceneRef = useRef<Scene | null>(null);
   const personaInstanceRef = useRef<Persona | null>(null);
   const transcriptRef = useRef<HTMLDivElement | null>(null);
+  const transcriptStateRef = useRef<TranscriptEntry[]>([]);
   const [status, setStatus] = useState('Disconnected');
 	const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
 	// const [inputText, setInputText] = useState('');
@@ -74,6 +75,7 @@ function Home() {
           console.log('🤖 Adding Finn message to transcript:', personaSpeech);
           setTranscript(prev => {
             const newTranscript = [...prev, { source: 'persona' as const, text: personaSpeech }];
+            transcriptStateRef.current = newTranscript; // Keep ref in sync
             console.log('🤖 Updated transcript after Finn message:', newTranscript);
             return newTranscript;
           });
@@ -104,6 +106,7 @@ function Home() {
         console.log('👤 Adding user message to transcript:', userSpeech);
         setTranscript(prev => {
           const newTranscript = [...prev, { source: 'user' as const, text: userSpeech }];
+          transcriptStateRef.current = newTranscript; // Keep ref in sync
           console.log('👤 Updated transcript after user message:', newTranscript);
           return newTranscript;
         });
@@ -301,16 +304,17 @@ function Home() {
   };
 
   const reset = async () => {
+    const currentTranscript = transcriptStateRef.current;
     console.log('🛑 RESET: End Conversation button clicked!');
-    console.log('🛑 RESET: Current transcript length:', transcript.length);
-    console.log('🛑 RESET: Full transcript contents:', transcript);
+    console.log('🛑 RESET: Current transcript length:', currentTranscript.length);
+    console.log('🛑 RESET: Full transcript contents:', currentTranscript);
     
     // Save conversation if there are messages
-    if (transcript.length > 0) {
+    if (currentTranscript.length > 0) {
       try {
         // Generate a title from the first user message or use timestamp
         let title = `Chat ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
-        const firstUserMessage = transcript.find(entry => entry.source === 'user');
+        const firstUserMessage = currentTranscript.find(entry => entry.source === 'user');
         if (firstUserMessage) {
           title = firstUserMessage.text.slice(0, 50) + (firstUserMessage.text.length > 50 ? '...' : '');
         }
@@ -318,15 +322,15 @@ function Home() {
         console.log('💾 SAVE: Attempting to save conversation with title:', title);
         console.log('💾 SAVE: Data being saved:', {
           title,
-          transcript: transcript,
-          messageCount: transcript.length,
+          transcript: currentTranscript,
+          messageCount: currentTranscript.length,
           owner: cognitoUser.userId
         });
 
         const result = await client.models.Conversation.create({
           title,
-          transcript: JSON.stringify(transcript),
-          messageCount: transcript.length,
+          transcript: JSON.stringify(currentTranscript),
+          messageCount: currentTranscript.length,
           owner: cognitoUser.userId
         });
         
@@ -357,6 +361,7 @@ function Home() {
       console.log('🧹 CLEANUP: Disconnecting scene and clearing transcript...');
       setShowPersona(false);
       setTranscript([]);
+      transcriptStateRef.current = []; // Also clear the ref
       sceneRef.current.disconnect();
       sceneRef.current = null;
     }
