@@ -147,7 +147,7 @@ function Home() {
   if (!scene) return;
 
   const originalHandler = scene.onSceneMessage;
-  scene.onSceneMessage = function (message: SceneResponse) {
+  scene.onSceneMessage = async function (message: SceneResponse) {
     // console.log('🧠 [custom hook] Incoming scene message:', message);
     console.log('WS message received:', message);
 
@@ -173,7 +173,7 @@ function Home() {
         }
         if (json && json.type === "open_external_link" && json.url) {
           console.log('Opening external link:', json.url);
-          reset();
+          await reset();
           navigate('/breathe')
         }
       }
